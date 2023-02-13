@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="sidebar">
+  <div id="sidebar">
+    <div id="menu-mask"></div>
+    <div id="sidebar-menus">
+      <div class="avatar-img is-center" style="background-image: url(/themes/theme-willing/assets/images/m-bg.jpg)">
+        <th:block th:with="stats = ${siteStatsFinder.getStats()}">
+          <img th:src="'https://q1.qlogo.cn/g?b=qq&amp;nk='+${theme.config.personal.qq}+'&amp;s=5'" onerror="this.onerror=null;this.src='/themes/theme-willing/assets/images/avatar.png'" alt="avatar">          <div class="sidebar-site-data site-data is-center">
+            <a th:href="@{/archives}" data-pjax-state="">
+              <div class="headline">文章数</div>
+              <div class="length-num">[[${stats.post}]]</div>
+            </a>
+            <a th:href="@{/tags}" data-pjax-state="">
+              <div class="headline">分类数</div>
+              <div class="length-num">[[${stats.category}]]</div>
+            </a>
+            <a href="#" data-pjax-state="">
+              <div class="headline">访问量</div>
+              <div class="card_comment length-num">[[${stats.visit}]]</div>
+            </a>
+          </div>
+        </th:block>
+      </div>
+      <!--        start——手机左侧导航-->
+      <div class="menus_items" th:with="menu = ${menuFinder.getByName(theme.config.header.menuItem)}">
+        <th:block th:with="menuItems = ${menu.menuItems}">
+          <div class="menus_item"
+               th:each="menuItem : ${menuItems}">
+            <a class="site-page group hide" href="#" rel="noopener external nofollow" data-pjax-state="">
+              <i class="fa-fw fa-solid fa-book"></i>
+              <span> [[${menuItem.status.displayName}]]</span>
+              <i class="fas fa-chevron-down">
+              </i>
+            </a>
+            <th:block th:if="${not #lists.isEmpty(menuItem.children)}">
+              <ul class="menus_item_child">
+                <li th:each="childMenu : ${menuItem.children}">
+                  <a class="site-page child" th:href="@{${childMenu.status.href}}" data-pjax-state="">
+                    <th:block th:utext="${#annotations.get(menuItem, 'icon')}"></th:block>
+                    <span> [[${childMenu.status.displayName}]]</span>
+                  </a>
+                </li>
+
+              </ul>
+            </th:block>
+          </div>
+        </th:block>
+
+
+      </div>
+      <div id="sidebar-bottom">
+        <a target="_blank" href="https://travellings.link" rel="noopener external nofollow" title="开往 - 随机跳转到另一个加入开往的网页"><i class="fas fa-subway fa-fw"></i></a>
+        <!--          <a href="javascript:;" rel="noopener external nofollow" onclick="leonus.randomPost()" title="随机文章" data-pjax-state=""><i class="fas fa-splotch"></i></a>-->
+        <a href="javascript:;" rel="noopener external nofollow" onclick="leonus.toggleWinbox()" title="切换背景" data-pjax-state=""><i class="fas fa-image"></i></a>
+      </div>
+
+    </div>
+    <!--end——手机左侧导航-->
+
+  </div>
+</th:block>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="aside">
+  <div class="aside-content" id="aside-content">
+<!--    个人信息栏-->
+    <th:block th:fragment="personal">
+    <div class="card-widget card-info wow animate__fadeIn" data-wow-duration="" data-wow-delay="" data-wow-offset="" data-wow-iteration="" style="visibility: visible;">
+      <div class="is-center">
+        <div class="avatar-img">
+          <img th:src="'https://q1.qlogo.cn/g?b=qq&amp;nk='+${theme.config.personal.qq}+'&amp;s=5'" onerror="this.onerror=null;this.src='/themes/theme-willing/assets/images/avatar.png'" alt="avatar">
+        </div>
+        <div class="author-info__name">[[${theme.config.personal.nickName ?: site.title}]]</div>
+        <div class="author-info__description">[[${theme.config.personal.signature}]]</div>
+      </div>
+      <th:block th:with="stats = ${siteStatsFinder.getStats()}">
+        <div class="card-info-data site-data is-center">
+          <a th:href="@{archives}" th:title="'累计文章数: '+${stats.post}" data-pjax-state="">
+            <div class="length-num">[[${stats.post}]]</div>
+            <div class="headline">文章数</div>
+          </a>
+          <a th:href="@{archives}" th:title="'累计标签数: '+${stats.category}" data-pjax-state="">
+            <div class="length-num">[[${stats.category}]]</div>
+            <div class="headline">分类数</div>
+          </a>
+          <a href="#" data-pjax-state="" th:title="'累计评论数：'+${stats.comment}">
+            <div class="card_comment length-num">[[${stats.comment}]]</div>
+            <div class="headline">评论数</div>
+          </a>
+        </div>
+      </th:block>
+    </div>
+    </th:block>
+<!--    公告-->
+    <th:block th:fragment="notice">
+    <div class="card-widget card-announcement wow animate__fadeIn" data-wow-duration="" data-wow-delay="" data-wow-offset="" data-wow-iteration="" style="visibility: visible;">
+      <div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div>
+      <div class="announcement_content">[[${theme.config.leftAside.noticeWidgets}]]</div>
+    </div>
+    </th:block>
+    <th:block th:fragment="updates">
+      <div class="card-widget card-recent-post wow animate__fadeIn" data-wow-duration="" data-wow-delay="" data-wow-offset="" data-wow-iteration="" style="visibility: visible;">
+        <div class="item-headline"><i class="fas fa-history"></i><span>最近更新</span></div>
+        <th:block th:with="archives = ${postFinder.archives(1,5)}">
+          <th:block th:each="archive : ${archives.items}">
+            <th:block th:each="month : ${archive.months}">
+              <div class="aside-list" th:with="posts = ${postFinder.list(1,5)}">
+                <div class="aside-list-item" th:each="post : ${month.posts}">
+                  <a class="thumbnail" th:href="@{${post.status.permalink}}" th:title="${post.spec.title}" data-pjax-state=""><img th:src="${#strings.isEmpty(post.spec.cover) ? theme.config.basics.postRandomImg+'?pageid='+post.metadata.name : post.spec.cover}" onerror="this.onerror=null;this.src='/themes/assets/theme-willing/images/404.gif'" th:alt="${post.spec.title}"></a>
+                  <div class="content"><a class="title" th:href="@{${post.status.permalink}}" th:title="${post.spec.title}" data-pjax-state="">[[${post.spec.title}]]</a><time th:datetime="${#dates.format(post.spec.publishTime,'yyyy-MM-dd')}" th:title="'更新'+ ${#dates.format(post.spec.publishTime,'yyyy-MM-dd')}">[[${#dates.format(post.spec.publishTime,'yyyy-MM-dd')}]]</time>
+                  </div>
+                </div>
+              </div>
+            </th:block>
+          </th:block>
+        </th:block>
+      </div>
+    </th:block>
+<!--    评论模块-->
+    <th:block th:fragment="comment">
+      <div class="card-widget wow animate__fadeIn" id="card-newest-comments" data-wow-duration="" data-wow-delay="" data-wow-offset="" data-wow-iteration="" style="visibility: hidden; animation-name: none;">
+        <div class="item-headline"><i class="fas fa-comment-dots"></i><span>最新评论</span></div>
+        <div class="aside-list">
+          <div class="aside-list-item">
+            <a href="2022/bb.html#ad24289e34fd48c6a966e135865db17d" class="thumbnail" data-pjax-state=""><img src="https://thirdqq.qlogo.cn/g?b=sdk&amp;k=ksRkg9wGBFbhrhiatdmXOrw&amp;kti=Y-XjBQAAAAA&amp;s=140&amp;t=1659599636" alt="道宣"></a>
+            <div class="content">
+              <a class="comment" href="2022/bb.html#ad24289e34fd48c6a966e135865db17d" title="好哒
+" data-pjax-state="">好哒
+              </a>
+              <div class="name"><span>道宣 / </span><time datetime="2023-02-10T06:24:05.555Z">4 小时前</time></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </th:block>
+<!--    便签云-->
+    <th:block th:fragment="tag">
+      <div class="card-widget card-tags wow animate__fadeIn" data-wow-duration="" data-wow-delay="" data-wow-offset="" data-wow-iteration="" style="visibility: hidden; animation-name: none;">
+        <div class="item-headline"><i class="fas fa-tags"></i>
+          <span>文章标签</span>
+          <a class="card-more-btn" th:href="@{/tags}" title="查看更多" data-pjax-state=""><i class="fas fa-angle-right"></i></a></div>
+        <div class="card-tag-cloud" th:with="tags = ${tagFinder.list(1,10)}">
+          <a th:href="@{${tag.status.permalink}}" th:each="tag : ${tags.items}"  data-pjax-state="">[[${tag.spec.displayName}]] ([[${tag.status.postCount}]])</a>
+        </div>
+      </div>
+    </th:block>
+    <th:block th:fragment="archive">
+      <div class="card-widget card-archives wow animate__fadeIn" data-wow-duration="" data-wow-delay="" data-wow-offset="" data-wow-iteration="" style="visibility: hidden; animation-name: none;">
+        <div class="item-headline"><i class="fas fa-archive"></i><span>文章归档</span>
+          <a class="card-more-btn" th:href="@{/archives}" title="查看更多" data-pjax-state="">
+            <i class="fas fa-angle-right"></i></a>
+        </div>
+        <ul class="card-archive-list" th:with="archives = ${postFinder.archives(1,1000)}">
+          <li class="card-archive-list-item" th:each="archive : ${archives.items}">
+            <th:block th:each="month : ${archive.months}">
+
+              <a class="card-archive-list-link" th:href="@{'/archives/'+${archive.year}+'/'+${month.month}}" data-pjax-state="">
+                <span class="card-archive-list-date">[[${archive.year}]]-[[${month.month}]]</span>
+                <span class="card-archive-list-count" >[[${month.posts.size()}]]</span>
+              </a>
+            </th:block>
+          </li>
+
+        </ul>
+      </div>
+    </th:block>
+<!--    站点资讯-->
+    <th:block th:fragment="information">
+      <div class="card-widget card-webinfo wow animate__fadeIn" data-wow-duration="" data-wow-delay="" data-wow-offset="" data-wow-iteration="" style="visibility: hidden; animation-name: none;">
+        <th:block th:with="stats = ${siteStatsFinder.getStats()}">
+          <div class="item-headline"
+          ><i class="fas fa-chart-line"></i><span>网站资讯</span></div>
+          <div class="webinfo">
+            <div class="webinfo-item">
+              <div class="item-name">文章数 :</div>
+              <div class="item-count">[[${stats.post}]]</div>
+            </div>
+            <div class="webinfo-item">
+              <div class="item-name">运行时长 :</div>
+              <div class="item-count" id="runtimeshow" th:data-publishdate="${theme.config.basics.siteStartTime}"></div>
+            </div>
+            <div class="webinfo-item">
+              <div class="item-name">分类数 :</div>
+              <div class="item-count">[[${stats.category}]]</div>
+            </div>
+            <div class="webinfo-item">
+              <div class="item-name">访问量 :</div>
+              <div class="item-count" id="last-push-date">[[${stats.visit}]]</div>
+            </div>
+
+          </div>
+        </th:block>
+      </div>
+    </th:block>
+    <th:block th:fragment="toc">
+    <div class="card-widget wow animate__fadeIn" id="card-toc" data-wow-duration="" data-wow-delay="" data-wow-offset="" data-wow-iteration="" style="visibility: visible; animation-name: fadeIn;">
+      <div class="item-headline">
+        <i class="fas fa-stream"></i>
+        <span>目录</span>
+        <span class="toc-percentage"></span>
+      </div>
+      <div class="toc-content is-expand">
+
+    </div>
+    </div>
+    </th:block>
+
+
+  </div>
+</th:block>
+</html>

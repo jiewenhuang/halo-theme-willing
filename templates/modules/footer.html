@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="footer">
+    <footer id="footer" style="background: transparent">
+        <th:block th:if="${theme.config.footer.socials != null}">
+        <div id="footer_icons">
+            <div>
+                <th:block th:each="socialsGroup : ${theme.config.footer.socials}">
+                <a class="icon_link" target="_blank" rel="noopener" th:href="${socialsGroup.url}" th:title="${socialsGroup.name}">
+                    <th:block th:utext="${socialsGroup.icon}"></th:block>
+                </a>
+                </th:block>
+            </div>
+        </div>
+        </th:block>
+        <div id="footer_content" >
+            <th:block th:if="${theme.config.footer.listGroup != null}">
+                <th:block th:each="listGroup : ${theme.config.footer.listGroup}"
+                          th:with="menu = ${menuFinder.getByName(listGroup.menu)}">
+            <div class="footer-group" th:with="menuItems = ${menu.menuItems}">
+                <h3 class="footer-title">[[${listGroup.name}]]</h3>
+                <div class="footer-links">
+                    <th:block th:each="menuItem : ${menuItems}">
+                    <a class="footer-item"
+                       th:href="@{${menuItem.status.href}}"
+                       data-pjax-state=""
+                       >[[${menuItem.status.displayName}]]</a>
+                    </th:block>
+                </div>
+            </div>
+            </th:block>
+        </div>
+        <div id="footer-bottom">
+            <div class="footer-bottom-content">
+                <div class="footer-bottom-left"><span>©2022 - 2023 By <a target="_blank" rel="noopener" th:href="${site.url}" title="点击访问主页" style="margin-left:5px">[[${site.title}]] </a></span>
+                    <div>
+                        <a class="footer-bottom-link" target="_blank" href="https://www.foreverblog.cn/go.html" rel="noopener external nofollow" title="随机访问十年之约友链博客">虫洞</a>
+                        <a class="footer-bottom-link" target="_blank" href="https://www.foreverblog.cn/" rel="noopener external nofollow" title="十年之约">十年之约</a>
+                        <a class="footer-bottom-link" target="_blank" href="https://storeweb.cn/member/o/1462" rel="noopener external nofollow" title="个站商店">个站商店</a>
+                    </div>
+                </div>
+                <div class="footer-bottom-right">
+                    <div id="runtime" title="已运行时长"></div>
+                    <div><a class="footer-bottom-link" target="_blank" href="https://halo.run/" rel="noopener external nofollow" title="框架">Halo</a>
+                        <a class="footer-bottom-link" target="_blank" href="https://github.com/jiewenhuang" rel="noopener external nofollow" title="主题">Willing</a>
+                        <th:block th:if="not ${theme.config.basics.icp == null}">
+                        <a class="footer-bottom-link" target="_blank" href="https://beian.miit.gov.cn/" rel="noopener external nofollow" title="备案号">[[${theme.config.basics.icp}]]</a>
+                        </th:block>
+                        <div class="item-count" id="runtimeshow" th:data-publishdate="${theme.config.basics.siteStartTime}" style="display: none"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+</th:block>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="aside">
+  <div class="aside-content" id="aside-content">
+    <!--  首页-->
+    <th:block th:if="${htmlType == 'index'}">
+      <th:block th:each="widgets : ${#strings.listSplit(theme.config.leftAside.indexWidgets, ',')}">
+        <th:block th:replace="modules/widgets/aside :: ${widgets}" />
+      </th:block>
+    </th:block>
+    <!--  文章页-->
+    <th:block th:if="${htmlType == 'post'}">
+      <th:block th:each="widgets : ${#strings.listSplit(theme.config.leftAside.postWidgets, ',')}">
+        <th:block th:replace="modules/widgets/aside :: ${widgets}" />
+      </th:block>
+    </th:block>
+
+
+
+
+
+  </div>
+</th:block>
+
+</html>

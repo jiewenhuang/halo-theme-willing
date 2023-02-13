@@ -1,0 +1,13 @@
+apiVersion: v1alpha1
+kind: AnnotationSetting
+metadata:
+  generateName: annotation-setting-
+spec:
+  targetRef:
+    group: ""
+    kind: MenuItem
+  formSchema:
+    - $formkit: "text"
+      name: "icon"
+      label: "icon图标"
+      help: "格式：<i class=\"fa-regular fa-envelope\"></i>,相关代码：fontawesome.com"

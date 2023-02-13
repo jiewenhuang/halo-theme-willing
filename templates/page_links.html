@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{modules/layout :: html(title = '友链' + ' - ' + ${site.title},htmlType = links,header = null,leftSidebar = true,rightSidebar = false, content = ~{::content}, head = null, footer = null)}"
+>
+<th:block th:fragment="content">
+  <!--  sidebar-->
+  <th:block th:replace="~{modules/widgets/m-sidebar :: sidebar}" />
+  <div class="page" id="body-wrap">
+    <!--    header-->
+    <th:block th:replace="~{modules/header :: header}" />
+    <main class="layout hide-aside" id="content-inner">
+      <div id="page">
+        <h1 class="page-title">友情链接</h1>
+        <div id="article-container">
+          <div class="flink">
+            <div class="page-top-card" style="background-image: url(/themes/theme-willing/assets/images/link_banner.webp);">
+              <div class="content-item-tips">友链</div>
+              <span class="content-item-title">友情链接</span>
+              <div class="content-bottom">
+                <div class="tips">与各位名博主一路同行。</div>
+                <a class="banner-button" href="#申请友链" data-pjax-state="">
+                  <i class="fa-solid fa-plus"></i>
+                  <span>申请友链</span></a></div>
+            </div>
+            <th:block th:each="group : ${linkFinder.groupBy()}">
+            <h2 th:id="${group.spec.displayName}">
+              <a th:href="'#'+${group.spec.displayName}" class="headerlink" title="官方 ([[${group.links.size()}]])" data-pjax-state=""></a>[[${group.spec.displayName}]] ([[${group.links.size()}]])</h2>
+            <div class="flink-list">
+              <div class="flink-list-item" th:each="link : ${group.links}" :key="i">
+                <a th:href="${link.spec.url}" rel="noopener external nofollow" title="Hexo" target="_blank">
+                  <div class="flink-item-icon">
+                    <img class="no-lightbox" th:src="${link.spec.logo}" onerror="this.onerror=null;this.src=&quot;/themes/theme-willing/assets/images/loading.svg&quot;" th:alt="${link.spec.displayName}">
+                    <div class="img-alt is-center">[[${link.spec.displayName}]]</div>
+                  </div>
+                  <div class="flink-item-info">
+                    <div class="flink-item-name">[[${link.spec.displayName}]]</div>
+                    <div class="flink-item-desc" th:title="${link.spec.description}">[[${link.spec.description}]]</div>
+                  </div>
+                  <div class="flink-item-bg">
+                    <img class="no-lightbox" th:src="${link.spec.logo}" onerror="this.onerror=null;this.src=&quot;/themes/theme-willing/assets/images/loading.svg&quot;">
+                  </div>
+                </a>
+              </div>
+            </div>
+            </th:block>
+            <style>
+              /* 页面初始化 */
+
+              div#page {
+                background: none;
+                border: 0;
+                padding: 0;
+              }
+
+              .page-title {
+                display: none;
+              }
+
+              .tk-expand,
+              .tk-comments-container>.tk-comment,
+              .tk-submit:nth-child(1) {
+                background: var(--card-bg);
+                border: var(--leonus-border);
+                box-shadow: 0 5px 10px rgb(189 189 189 / 10%);
+                transition: all .3s ease-in-out;
+                border-radius: 12px;
+              }
+
+              .tk-comments-container>.tk-comment:hover,
+              .tk-submit:nth-child(1):hover {
+                border-color: var(--leonus-purple);
+              }
+
+              .tk-submit {
+                padding: 20px 10px 0;
+              }
+
+              .tk-comments-container>.tk-comment {
+                padding: 15px;
+              }
+
+              .page-top-card {
+                background-color: #666;
+              }
+              /* 页面初始化结束 */
+
+              .addBtn button:hover {
+                background: var(--leonus-purple);
+                color: white;
+              }
+
+              [data-theme=dark] .addBtn button:hover {
+                background: var(--leonus-blue);
+              }
+
+              .addBtn {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+              }
+
+              .addBtn i {
+                font-size: 1.3rem;
+                margin-right: 10px;
+              }
+
+              .addBtn button {
+                transition: .2s;
+                min-width: 8rem;
+                display: flex;
+                justify-content: center;
+                margin: 5px auto;
+                color: var(--global-bg);
+                padding: 15px;
+                border-radius: 12px;
+                background: var(--search-result-title);
+                align-items: center;
+              }
+            </style>
+
+            <h2 id="申请友链">
+              <a href="#申请友链" class="headerlink" title="申请友链" data-pjax-state=""></a>申请友链</h2>
+            <article class="post-content" th:utext="${singlePage.content.content}">
+
+            </article>
+
+        <hr>
+        <div id="post-comment">
+          <div class="comment-head">
+            <div class="comment-headline"><i class="fa-solid fa-message fa-fw"></i><span> 评论</span></div>
+          </div>
+          <div class="comment-wrap">
+            <halo:comment group="content.halo.run" kind="singlePage" th:attr="name=${singlePage.metadata.name}" colorScheme="document.documentElement.getAttribute('data-theme')" />
+
+          </div>
+        </div>
+        <link href="https://cdn.staticfile.org/prism/1.28.0/themes/prism-twilight.min.css" rel="stylesheet" type="text/css">
+      </div>
+        </div>
+  </div>
+  </main>
+    <!--底部模块-->
+    <th:block th:replace="~{modules/footer :: footer}" />
+  </div>
+
+
+</th:block>
+</html>

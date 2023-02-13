@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="rightSide">
+  <th:block th:if="${htmlType == 'post'}">
+    <div id="rightside" style="">
+      <div id="rightside-config-show">
+        <button class="share" type="button" title="分享链接" onclick="leonus.share()"><i class="fas fa-share-nodes"></i></button>
+        <button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button>
+        <a id="to_comment" href="#post-comment" title="直达评论" data-pjax-state=""><i class="fas fa-message"></i></a>
+        <button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button>
+        <button id="go-up" type="button" title="回到顶部"><i class="fas fa-caret-up" style="display: none;"></i><span id="percent" style="display: block;">0</span></button>
+        <button id="go-down" type="button" title="直达底部" onclick="btf.scrollToDest(document.body.scrollHeight, 500)" style="display: block;"><i class="fas fa-caret-down"></i></button>
+      </div>
+    </div>
+</th:block>
+  <th:block th:if="${htmlType == 'index'}">
+    <div id="rightside">
+      <div id="rightside-config-show">
+        <button class="share" type="button" title="分享链接" onclick="leonus.share()"><i class="fas fa-share-nodes"></i></button>
+        <button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button>
+        <button id="go-up" type="button" title="回到顶部"><i class="fas fa-caret-up"></i><span id="percent">0</span></button>
+        <button id="go-down" type="button" title="直达底部" onclick="btf.scrollToDest(document.body.scrollHeight, 500)"><i class="fas fa-caret-down"></i></button>
+      </div>
+    </div>
+  </th:block>
+  <th:block th:if="${htmlType == 'tag'}">
+    <div id="rightside" style="">
+      <div id="rightside-config-show">
+        <button class="share" type="button" title="分享链接" onclick="leonus.share()"><i class="fas fa-share-nodes"></i></button>
+        <button id="go-up" type="button" title="回到顶部"><i class="fas fa-caret-up" style="display: none;"></i><span id="percent" style="display: block;">0</span></button>
+        <button id="go-down" type="button" title="直达底部" onclick="btf.scrollToDest(document.body.scrollHeight, 500)" style="display: block;"><i class="fas fa-caret-down"></i></button>
+      </div>
+    </div>
+  </th:block>
+  <th:block th:if="${htmlType == 'category'}">
+    <div id="rightside" style="">
+      <div id="rightside-config-show">
+        <button class="share" type="button" title="分享链接" onclick="leonus.share()"><i class="fas fa-share-nodes"></i></button>
+        <button id="go-up" type="button" title="回到顶部"><i class="fas fa-caret-up" style="display: none;"></i><span id="percent" style="display: block;">0</span></button>
+        <button id="go-down" type="button" title="直达底部" onclick="btf.scrollToDest(document.body.scrollHeight, 500)" style="display: block;"><i class="fas fa-caret-down"></i></button>
+      </div>
+    </div>
+  </th:block>
+  <th:block th:if="${htmlType == 'links'}">
+    <div id="rightside" style="">
+      <div id="rightside-config-show">
+        <button class="share" type="button" title="分享链接" onclick="leonus.share()">
+          <i class="fas fa-share-nodes"></i>
+        </button>
+        <a id="to_comment" href="#post-comment" title="直达评论" data-pjax-state="anchor">
+          <i class="fas fa-message"></i>
+        </a>
+        <button id="go-up" type="button" title="回到顶部"><i class="fas fa-caret-up" style="display: none;"></i><span id="percent" style="display: block;">0</span></button><button id="go-down" type="button" title="直达底部" onclick="btf.scrollToDest(document.body.scrollHeight, 500)" style="display: block;"><i class="fas fa-caret-down"></i></button></div></div>
+  </th:block>
+</th:block>
+</html>

@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en" th:fragment="html (title,header,content,head,footer,leftSidebar,leftSidebar,htmlType)" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        @keyframes wb-fade-in {
+            0% {
+                opacity: 0
+            }
+            to {
+                opacity: .85
+            }
+        }
+
+        .winbox {
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: #0050ff;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, .25), 0 10px 10px rgba(0, 0, 0, .22);
+            transition: width .3s, height .3s, left .3s, top .3s;
+            transition-timing-function: cubic-bezier(.3, 1, .3, 1);
+            contain: layout size;
+            text-align: left;
+            touch-action: none
+        }
+
+        .wb-body,
+        .wb-header {
+            position: absolute;
+            left: 0
+        }
+
+        .wb-header {
+            top: 0;
+            width: 100%;
+            height: 35px;
+            line-height: 35px;
+            color: #fff;
+            overflow: hidden;
+            z-index: 1
+        }
+
+        .wb-body {
+            top: 35px;
+            right: 0;
+            bottom: 0;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            overflow-scrolling: touch;
+            will-change: contents;
+            background: #fff;
+            margin-top: 0!important;
+            contain: strict;
+            z-index: 0
+        }
+
+        .wb-control *,
+        .wb-icon {
+            background-repeat: no-repeat
+        }
+
+        body>.wb-body {
+            position: relative;
+            display: inline-block;
+            visibility: hidden;
+            contain: none
+        }
+
+        .wb-drag {
+            height: 100%;
+            padding-left: 10px;
+            cursor: move
+        }
+
+        .wb-title {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .wb-icon {
+            display: none;
+            width: 20px;
+            height: 100%;
+            margin: -1px 8px 0-3px;
+            float: left;
+            background-size: 100%;
+            background-position: center
+        }
+
+        .wb-e,
+        .wb-w {
+            width: 10px;
+            top: 0
+        }
+
+        .wb-n,
+        .wb-s {
+            left: 0;
+            height: 10px;
+            position: absolute
+        }
+
+        .wb-n {
+            top: -5px;
+            right: 0;
+            cursor: n-resize;
+            z-index: 2
+        }
+
+        .wb-e {
+            position: absolute;
+            right: -5px;
+            bottom: 0;
+            cursor: w-resize;
+            z-index: 2
+        }
+
+        .wb-s {
+            bottom: -5px;
+            right: 0;
+            cursor: n-resize;
+            z-index: 2
+        }
+
+        .wb-nw,
+        .wb-sw,
+        .wb-w {
+            left: -5px
+        }
+
+        .wb-w {
+            position: absolute;
+            bottom: 0;
+            cursor: w-resize;
+            z-index: 2
+        }
+
+        .wb-ne,
+        .wb-nw,
+        .wb-sw {
+            width: 15px;
+            height: 15px;
+            z-index: 2;
+            position: absolute
+        }
+
+        .wb-nw {
+            top: -5px;
+            cursor: nw-resize
+        }
+
+        .wb-ne,
+        .wb-sw {
+            cursor: ne-resize
+        }
+
+        .wb-ne {
+            top: -5px;
+            right: -5px
+        }
+
+        .wb-se,
+        .wb-sw {
+            bottom: -5px
+        }
+
+        .wb-se {
+            position: absolute;
+            right: -5px;
+            width: 15px;
+            height: 15px;
+            cursor: nw-resize;
+            z-index: 2
+        }
+
+        .wb-control {
+            float: right;
+            height: 100%;
+            max-width: 100%;
+            text-align: center
+        }
+
+        .wb-control * {
+            display: inline-block;
+            width: 30px;
+            height: 100%;
+            max-width: 100%;
+            background-position: center;
+            cursor: pointer
+        }
+
+        .no-close .wb-close,
+        .no-full .wb-full,
+        .no-header .wb-header,
+        .no-max .wb-max,
+        .no-min .wb-min,
+        .no-resize .wb-body~div,
+        .wb-body .wb-hide,
+        .wb-show,
+        .winbox.hide,
+        .winbox.min .wb-body>*,
+        .winbox.min .wb-full,
+        .winbox.min .wb-min,
+        .winbox.modal .wb-full,
+        .winbox.modal .wb-max,
+        .winbox.modal .wb-min {
+            display: none
+        }
+
+        .winbox.max .wb-drag,
+        .winbox.min .wb-drag {
+            cursor: default
+        }
+
+        .wb-min {
+            background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNiAyIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNOCAwaDdhMSAxIDAgMCAxIDAgMkgxYTEgMSAwIDAgMSAwLTJoN3oiLz48L3N2Zz4=);
+            background-size: 14px auto;
+            background-position: center calc(50% + 6px)
+        }
+
+        .wb-max {
+            background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9IiNmZmYiIHZpZXdCb3g9IjAgMCA5NiA5NiI+PHBhdGggZD0iTTIwIDcxLjMxMUMxNS4zNCA2OS42NyAxMiA2NS4yMyAxMiA2MFYyMGMwLTYuNjMgNS4zNy0xMiAxMi0xMmg0MGM1LjIzIDAgOS42NyAzLjM0IDExLjMxMSA4SDI0Yy0yLjIxIDAtNCAxLjc5LTQgNHY1MS4zMTF6Ii8+PHBhdGggZD0iTTkyIDc2VjM2YzAtNi42My01LjM3LTEyLTEyLTEySDQwYy02LjYzIDAtMTIgNS4zNy0xMiAxMnY0MGMwIDYuNjMgNS4zNyAxMiAxMiAxMmg0MGM2LjYzIDAgMTItNS4zNyAxMi0xMnptLTUyIDRjLTIuMjEgMC00LTEuNzktNC00VjM2YzAtMi4yMSAxLjc5LTQgNC00aDQwYzIuMjEgMCA0IDEuNzkgNCA0djQwYzAgMi4yMS0xLjc5IDQtNCA0SDQweiIvPjwvc3ZnPg==);
+            background-size: 17px auto
+        }
+
+        .wb-close {
+            background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ii0xIC0xIDE4IDE4Ij48cGF0aCBmaWxsPSIjZmZmIiBkPSJtMS42MTMuMjEuMDk0LjA4M0w4IDYuNTg1IDE0LjI5My4yOTNsLjA5NC0uMDgzYTEgMSAwIDAgMSAxLjQwMyAxLjQwM2wtLjA4My4wOTRMOS40MTUgOGw2LjI5MiA2LjI5M2ExIDEgMCAwIDEtMS4zMiAxLjQ5N2wtLjA5NC0uMDgzTDggOS40MTVsLTYuMjkzIDYuMjkyLS4wOTQuMDgzQTEgMSAwIDAgMSAuMjEgMTQuMzg3bC4wODMtLjA5NEw2LjU4NSA4IC4yOTMgMS43MDdBMSAxIDAgMCAxIDEuNjEzLjIxeiIvPjwvc3ZnPg==);
+            background-size: 15px auto;
+            background-position: 5px center
+        }
+
+        .wb-full {
+            background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2Utd2lkdGg9IjIuNSIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNOCAzSDVhMiAyIDAgMCAwLTIgMnYzbTE4IDBWNWEyIDIgMCAwIDAtMi0yaC0zbTAgMThoM2EyIDIgMCAwIDAgMi0ydi0zTTMgMTZ2M2EyIDIgMCAwIDAgMiAyaDMiLz48L3N2Zz4=);
+            background-size: 16px auto
+        }
+
+        .winbox.max .wb-body~div,
+        .winbox.min .wb-body~div,
+        .winbox.modal .wb-body~div,
+        .winbox.modal .wb-drag,
+        body.wb-lock iframe {
+            pointer-events: none
+        }
+
+        .winbox.max {
+            box-shadow: none
+        }
+
+        .winbox.max .wb-body {
+            margin: 0!important
+        }
+
+        .winbox iframe {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 0
+        }
+
+        body.wb-lock .winbox {
+            will-change: left, top, width, height;
+            transition: none
+        }
+
+        .winbox.modal:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            border-radius: inherit
+        }
+
+        .winbox.modal:after {
+            content: '';
+            position: absolute;
+            top: -50vh;
+            left: -50vw;
+            right: -50vw;
+            bottom: -50vh;
+            background: #0d1117;
+            animation: wb-fade-in .2s ease-out forwards;
+            z-index: -1
+        }
+
+        .no-animation {
+            transition: none
+        }
+
+        .no-shadow {
+            box-shadow: none
+        }
+
+        .no-header .wb-body {
+            top: 0
+        }
+
+        .no-move:not(.min) .wb-title {
+            pointer-events: none
+        }
+
+        .wb-body .wb-show {
+            display: revert
+        }
+    </style>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title th:text="${title}"></title>
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="ffffff">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN">
+    <meta name="twitter:card" content="summary">
+    <link rel="shortcut icon" th:href="@{${#strings.isEmpty(site.favicon) ? '/assets/images/jiewen_icon.png' : site.favicon}}"/>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="stylesheet" th:href="@{/assets/css/index.css}">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.1.1/css/all.min.css" media="all" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/node-snackbar/0.1.16/snackbar.min.css" media="all" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/fancyapps-ui/4.0.27/fancybox.min.css" media="all" onload="this.media='all'">
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+
+
+    <script>
+        const GLOBAL_CONFIG = {
+            root: '/',
+            algolia: {
+                "appId": "66G9CQHZB5",
+                "apiKey": "868e3d3ec7dbe3975dd5bbe492d35e04",
+                "indexName": "blog",
+                "hits": {
+                    "per_page": 10
+                },
+                "languages": {
+                    "input_placeholder": "搜索文章",
+                    "hits_empty": "找不到您查询的内容：${query}",
+                    "hits_stats": "找到 ${hits} 条结果，用时 ${time} 毫秒"
+                }
+            },
+            localSearch: undefined,
+            translate: undefined,
+            noticeOutdate: {
+                "limitDay": 60,
+                "position": "top",
+                "messagePrev": "距离上次更新已经",
+                "messageNext": "天了，文章内容可能已经过时。"
+            },
+            highlight: {
+                "plugin": "highlighjs",
+                "highlightCopy": true,
+                "highlightLang": true,
+                "highlightHeightLimit": 300
+            },
+            copy: {
+                success: '复制成功',
+                error: '复制错误',
+                noSupport: '浏览器不支持'
+            },
+            relativeDate: {
+                homepage: true,
+                post: false
+            },
+            runtime: '天',
+            date_suffix: {
+                just: '刚刚',
+                min: '分钟前',
+                hour: '小时前',
+                day: '天前',
+                month: '个月前'
+            },
+            copyright: undefined,
+            lightbox: 'fancybox',
+            Snackbar: {
+                "chs_to_cht": "你已切换为繁体",
+                "cht_to_chs": "你已切换为简体",
+                "day_to_night": "你已切换为深色模式",
+                "night_to_day": "你已切换为浅色模式",
+                "bgLight": "#4976f5",
+                "bgDark": "#333",
+                "position": "top-center"
+            },
+            source: {
+                justifiedGallery: {
+                    js: 'https://cdn.staticfile.org/flickr-justified-gallery/2.1.2/fjGallery.min.js',
+                    css: 'https://cdn.staticfile.org/flickr-justified-gallery/2.1.2/fjGallery.min.css'
+                }
+            },
+            isPhotoFigcaption: true,
+            islazyload: false,
+            isAnchor: false
+        }
+    </script>
+    <script id="config-diff">
+        var GLOBAL_CONFIG_SITE = {
+            title: 'Leonus',
+            isPost: false,
+            isHome: true,
+            isHighlightShrink: false,
+            isToc: false,
+            postUpdate: '2023-02-08 22:53:25'
+        }
+    </script>
+    <script>
+        (win => {
+            win.saveToLocal = {
+                set: function setWithExpiry(key, value, ttl) {
+                    if (ttl === 0) return
+                    const now = new Date()
+                    const expiryDay = ttl * 86400000
+                    const item = {
+                        value: value,
+                        expiry: now.getTime() + expiryDay,
+                    }
+                    localStorage.setItem(key, JSON.stringify(item))
+                },
+
+                get: function getWithExpiry(key) {
+                    const itemStr = localStorage.getItem(key)
+
+                    if (!itemStr) {
+                        return undefined
+                    }
+                    const item = JSON.parse(itemStr)
+                    const now = new Date()
+
+                    if (now.getTime() > item.expiry) {
+                        localStorage.removeItem(key)
+                        return undefined
+                    }
+                    return item.value
+                }
+            }
+
+            win.getScript = url => new Promise((resolve, reject) => {
+                const script = document.createElement('script')
+                script.src = url
+                script.async = true
+                script.onerror = reject
+                script.onload = script.onreadystatechange = function() {
+                    const loadState = this.readyState
+                    if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+                    script.onload = script.onreadystatechange = null
+                    resolve()
+                }
+                document.head.appendChild(script)
+            })
+
+            win.activateDarkMode = function() {
+                document.documentElement.setAttribute('data-theme', 'dark')
+                if (document.querySelector('meta[name="theme-color"]') !== null) {
+                    document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+                }
+            }
+            win.activateLightMode = function() {
+                document.documentElement.setAttribute('data-theme', 'light')
+                if (document.querySelector('meta[name="theme-color"]') !== null) {
+                    document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+                }
+            }
+            const t = saveToLocal.get('theme')
+
+            if (t === 'dark') activateDarkMode()
+            else if (t === 'light') activateLightMode()
+
+            const asideStatus = saveToLocal.get('aside-status')
+            if (asideStatus !== undefined) {
+                if (asideStatus === 'hide') {
+                    document.documentElement.classList.add('hide-aside')
+                } else {
+                    document.documentElement.classList.remove('hide-aside')
+                }
+            }
+
+            const detectApple = () => {
+                if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+                    document.documentElement.classList.add('apple')
+                }
+            }
+            detectApple()
+        })(window)
+    </script>
+
+
+    <script async="" src="https://at.alicdn.com/t/c/font_3435673_luzbbyhxtrq.js"></script>
+    <link rel="stylesheet" href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/Swiper/8.0.6/swiper-bundle.min.css">
+    <script defer="" src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/Swiper/8.0.6/swiper-bundle.min.js"></script>
+    <link rel="stylesheet" th:href="@{/assets/css/leonus.css}">
+    <script th:src="@{/assets/js/function.js}"></script>
+    <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/gsap/3.9.1/gsap.min.js"></script>
+    <!-- hexo injector head_end start -->
+    <link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/animate.css/4.1.1/animate.min.css" media="screen" onload="this.media='screen'">
+<!--    <script src="https://cdn.staticfile.org/twikoo/1.6.8/twikoo.all.min.js" async=""></script>-->
+<!--    样式群-->
+    <th:block th:replace="~{modules/layout/styleTk :: styleTk}" />
+    <th:block th:replace="~{modules/layout/styleEl :: styleEl}" />
+    <link rel="stylesheet" th:href="@{/assets/css/0w0.css}">
+
+
+</head>
+<body style="overflow: auto;" class="pace-done "><svg aria-hidden="true" style="position: absolute; width: 0px; height: 0px; overflow: hidden;"><symbol id="icon-xinxi" viewBox="0 0 1024 1024"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#F0E22C"></path><path d="M653.998 437.604c-35.295-64.941-32.334-143.896 7.716-206.02a318.708 318.708 0 0 0-143.199-35.928l-4.21 0.085c-110.009 0.2-212.101 57.127-269.895 150.474-57.793 93.342-63.085 209.872-13.975 308.051 0.148 0.354 0.148 0.777 0 1.123l-28.915 82.267c-5.414 15.359-2.192 32.429 8.423 44.795 10.632 12.357 27.059 18.133 43.1 15.162l90.796-17.491a1.33 1.33 0 0 1 1.05 0 316.812 316.812 0 0 0 170.03 49.823c9.471 0 19.37-0.436 29.348-1.313 151.576-13.729 272.019-132.854 287.031-283.883v-1.137c-74.056-0.445-142.007-41.07-177.3-106.008z m-268 156.792l0.259-0.097c-10.233 0.053-18.643-8.063-18.929-18.269a17.426 17.426 0 0 1 4.859-12.859 17.541 17.541 0 0 1 12.672-5.402H386c10.146 0 18.361 8.2 18.361 18.31-0.004 10.112-8.216 18.317-18.363 18.317z m253.107-0.094h-63.543l-8.757 50.353c-1.771 9.944-11.284 16.569-21.261 14.815-9.975-1.771-16.624-11.265-14.854-21.197l7.805-43.707H458.48l-8.771 50.345c-1.759 9.95-11.275 16.578-21.244 14.814-9.976-1.758-16.628-11.246-14.857-21.196l28.738-162.572h-57.233c-10.135 0-18.36-8.201-18.36-18.311 0-10.108 8.226-18.309 18.36-18.309h63.542l8.771-50.348c1.76-9.938 11.275-16.578 21.246-14.815 9.974 1.759 16.626 11.252 14.855 21.199l-7.792 43.706h80.015l8.756-50.346c1.822-9.962 11.399-16.576 21.384-14.766h0.447c9.982 1.77 16.646 11.271 14.888 21.231l-10.691 58.212a17.406 17.406 0 0 1-2.453 13.802l-16.031 90.471h57.048c10.135 0 18.362 8.188 18.362 18.311 0.006 10.123-8.22 18.308-18.355 18.308z m0.435-118.517h-1.919c-10.146 0-18.359-8.2-18.359-18.312 0-10.109 8.213-18.313 18.359-18.313h1.919c10.145 0 18.36 8.2 18.36 18.313-0.002 10.112-8.215 18.312-18.36 18.312z" fill="#FFFFFF"></path><path d="M479.095 480.106l-14.491 82.248h79.57l14.408-82.248z" fill="#FFFFFF"></path><path d="M664.528 233.339c-39.035 61.174-41.926 138.912-7.534 202.851 34.404 63.95 100.629 103.951 172.818 104.382 12.368-126.809-53.067-248.463-165.284-307.233z" fill="#FFFFFF" opacity=".4"></path></symbol><symbol id="icon-naozhong" viewBox="0 0 1024 1024"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#F9A336"></path><path d="M346.8 205.8c11.6-11.6 11.6-30.5 0-42.1-11.6-11.6-30.5-11.6-42.1 0L163.3 305.1c-11.6 11.6-11.6 30.5 0 42.1 5.8 5.8 13.4 8.7 21 8.7s15.2-2.9 21.1-8.7l141.4-141.4zM860 305.1L718.6 163.7c-11.6-11.6-30.5-11.6-42.1 0-11.6 11.6-11.6 30.5 0 42.1l141.4 141.4c5.8 5.8 13.4 8.7 21 8.7s15.3-2.9 21.1-8.7c11.6-11.7 11.6-30.5 0-42.1z" fill="#FFFFFF"></path><path d="M758.4 748.1c41.1-52.9 65.7-119.3 65.7-191.4 0-172.3-140.1-312.4-312.4-312.4S199.2 384.4 199.2 556.7c0 21.5 2.2 42.5 6.4 62.9 9.3-0.7 18.7-1.1 28.2-1.1 145.8 0 264 85.2 264 190.3 0 20.7-4.6 40.6-13 59.2 8.9 0.8 17.8 1.2 26.9 1.2 78.7 0 150.6-29.2 205.6-77.4l54 66.4c5.9 7.2 14.5 11 23.1 11 6.6 0 13.2-2.2 18.7-6.7 12.7-10.4 14.6-29.1 4.3-41.9l-59-72.5z m-78.8-129.6h-186c-16.4 0-29.8-13.3-29.8-29.8V410.2c0-16.4 13.3-29.8 29.8-29.8 16.4 0 29.8 13.3 29.8 29.8V559h156.2c16.4 0 29.8 13.3 29.8 29.8-0.1 16.3-13.4 29.7-29.8 29.7z" fill="#FFFFFF"></path><path d="M233.8 618.5c-9.5 0-18.9 0.4-28.2 1.1 9.8 47.7 30.4 91.4 59.3 128.5l-59 72.5c-10.4 12.8-8.5 31.5 4.3 41.9 5.5 4.5 12.1 6.7 18.7 6.7 8.7 0 17.2-3.7 23.1-11l54-66.4c48.6 42.6 110.6 70.4 178.7 76.2 8.4-18.6 13-38.5 13-59.2 0.1-105.1-118.1-190.3-263.9-190.3z" fill="#FFFFFF" opacity=".4"></path></symbol><symbol id="icon-shalou" viewBox="0 0 1024 1024"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#1BC1FA"></path><path d="M501.9 164.2H280.2c-16 0-29 12.9-29 29s12.9 29 29 29h29v94.7c0 47.1 20.1 92.2 55.1 123.7l49 44.1c7.7 6.9 12 16.5 12 26.9 0 10.4-4.3 19.9-12 26.9l-49 44.1c-35 31.5-55.1 76.6-55.1 123.7V801h-29c-16 0-29 13-29 29s12.9 28.9 29 28.9h463c16 0 28.9-12.9 28.9-29s-12.9-28.9-29-28.9h-29v-94.7c0-47.1-20.1-92.2-55.1-123.7l-49-44.1c-7.7-7-12-16.5-12-26.9 0-10.4 4.3-19.9 12-26.9l49-44.1c35-31.5 55.1-76.6 55.1-123.7v-5c-21-4.4-42.6-11.1-64.2-20.1-72.7-30.5-127.1-79.5-148-127.6z m102.2 488.6c15 15 23.3 35 23.3 56.3v91.8H395.9v-91.8c0-21.3 8.3-41.2 23.3-56.3l77.1-77.1c8.5-8.5 22.2-8.5 30.7 0l77.1 77.1z" fill="#FFFFFF"></path><path d="M743.2 222.1c16 0 29-12.9 29-28.9 0-16-12.9-29-29-29H501.9c20.9 48.1 75.2 97.1 148.1 127.4 21.6 9 43.2 15.7 64.2 20.1V222h29z" fill="#FFFFFF" opacity=".4"></path></symbol><symbol id="icon-biaoqian" viewBox="0 0 1024 1024"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#F9A336"></path><path d="M478.863 281.379c27.563-14.681 61.525-10.109 84.158 11.295a13.88 13.88 0 0 0 12.704 3.952 215.253 215.253 0 0 0 51.233-18.685c4.016-2.174 6.773-6.108 7.419-10.591 0.655-4.485-0.902-9.027-4.147-12.209l-36.441-36.196c-46.007-45.536-120.585-45.536-166.592 0L271.128 372.822l-2.682 3.643c-8.651 11.974-13.281 26.356-13.203 41.098V578.62c25.404-10.901 52.646-16.99 80.321-17.993l-0.301-0.2c0-11.891 9.744-21.537 21.746-21.537h294.363c11.416 0.765 20.271 10.153 20.271 21.492 0 11.323-8.854 20.721-20.271 21.479H440c40.799 19.337 74.749 50.416 97.407 89.174h30.764c11.424 0.774 20.279 10.167 20.279 21.491s-8.856 20.718-20.279 21.5H556.65c16.915 52.178 13.7 108.718-9.022 158.681h106.43c64.85-0.22 117.337-52.293 117.451-116.518V544.697l-1.189-122.13c-0.136-17.984-7.241-35.232-19.854-48.183l-2.494-2.551-44.171-43.762c-5.039-4.889-12.898-5.513-18.675-1.465-29.428 19.615-62.386 33.467-97.084 40.814a15.084 15.084 0 0 0-9.945 8.248c-13.644 27.883-43.87 43.905-74.868 39.676-30.998-4.228-55.739-27.729-61.277-58.221-5.556-30.5 9.349-61.077 36.911-75.744z" fill="#FFFFFF"></path><path d="M527.873 314.113c-5.848-0.307-11.581 1.751-15.827 5.729a21.042 21.042 0 0 0-6.721 15.315c-0.487 11.875 8.777 21.889 20.757 22.421h4.473c20.946 0 109.208-3.917 176.913-67.441l1.104-1.085c28.229-32.735 39.854-76.425 31.565-118.678-1.2-7.956-6.762-14.581-14.438-17.202-7.678-2.626-16.176-0.792-22.059 4.765-5.885 5.532-8.166 13.848-5.896 21.576 5.448 28.407-2.155 57.744-20.768 80.039-62.245 57.128-148.122 54.561-149.103 54.561z" fill="#FFFFFF"></path><path d="M365.451 671.15h171.955c-22.657-38.772-56.607-69.856-97.406-89.191h-83.09c-11.891-0.06-21.535-9.562-21.646-21.335a224.283 224.283 0 0 0-80.021 17.995v177.574c0.057 64.312 52.625 116.461 117.539 116.614h174.745a219.692 219.692 0 0 0 9.045-158.697H365.451c-8.108 0.551-15.84-3.428-20.053-10.294a21.415 21.415 0 0 1 0-22.372c4.213-6.885 11.945-10.844 20.053-10.294z" fill="#FFFFFF" opacity=".4"></path></symbol><symbol id="icon-shizhong" viewBox="0 0 1024 1024"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#A68EC0"></path><path d="M823.5 512c0-171.9-139.9-311.8-311.8-311.8S199.9 340 199.9 512c0 31.5 4.7 61.9 13.4 90.6 52.3-4.2 115.1 10.1 175 43.4 81.7 45.6 136 114.6 146.3 176.9C695.9 811.2 823.5 676.2 823.5 512zM660 673.2c-5.1 5.1-11.7 7.6-18.4 7.6-6.7 0-13.3-2.5-18.4-7.6L493.4 543.3c-4.9-4.9-7.6-11.5-7.6-18.4V356.1c0-14.3 11.7-26 26-26s26 11.6 26 26v158.1l122.3 122.3c10 10.2 10 26.6-0.1 36.7z" fill="#FFFFFF"></path><path d="M388.3 646c-59.8-33.4-122.7-47.6-175-43.4 38.9 127.9 157.9 221.2 298.4 221.2 7.7 0 15.3-0.3 22.9-0.8-10.4-62.4-64.6-131.4-146.3-177z" fill="#FFFFFF" opacity=".4"></path></symbol><symbol id="icon-gengxin" viewBox="0 0 1024 1024"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#F26D64"></path><path d="M464.804 619.285l18.761-43.15s16.468-42.525-40.649-32.311l-160.303 40.44s-14.513 4.15-20.94 14.854a206.407 206.407 0 0 1 15.828-0.618c90.542 0 165.369 58.964 177.322 135.498 81.825 17.702 277.417 33.239 326.836-205.182-0.001 0-74.211 175.312-316.855 90.469zM560.693 400.406L541.1 442.098s-17.719 40.857 39.606 32.311l160.72-35.646s36.689-9.381 20.429-39.399l-87.552-146.336s-27.309-24.181-45.443 4.586l-19.386 41.691c-0.21 0-296.634-112.567-367.093 181.982 0 0 78.588-169.058 318.312-80.881z" fill="#FFFFFF"></path><path d="M277.5 598.5c-5.335 0-10.611 0.217-15.828 0.618-3.762 6.264-4.757 14.769 1.554 26.005l91.721 148.213s27.516 24.18 45.235-6.046l18.344-43.15s13.884 5.011 36.295 9.858C442.869 657.464 368.042 598.5 277.5 598.5z" fill="#FFFFFF" opacity=".4"></path></symbol><symbol id="icon-youjian" viewBox="0 0 1024 1024"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#F9A238"></path><path d="M804.79 336.417a191.612 191.612 0 0 1-56.335 33.543 20.242 20.242 0 0 1 3.821 0.072 20.302 20.302 0 0 1 13.288 7.84 20.123 20.123 0 0 1 3.883 14.893 20.044 20.044 0 0 1-7.806 13.271l-128.609 97.195 128.521 128.522c7.479 7.917 7.32 20.347-0.347 28.074-7.688 7.724-20.116 7.953-28.079 0.526L600.525 527.754l-57.199 43.148c-15.328 10.737-35.733 10.737-51.063 0l-56.774-43.075-114.816 114.742c97.123-21.698 194.708 34.527 224.609 129.445h136.185c77.97-0.095 141.187-63.222 141.371-141.197V405.101a139.845 139.845 0 0 0-18.048-68.684z" fill="#FFFFFF"></path><path d="M403.064 503.159L274.457 406.04a19.912 19.912 0 0 1-7.827-13.282c-1.475-10.936 6.099-21.055 17.021-22.724a20.002 20.002 0 0 1 14.817 4.007l218.39 164.695h1.107c0.45 0.073 0.913 0.073 1.362 0L737.049 374.3c-94.861 29.422-196.574-18.422-234.313-110.398H341.02c-77.971 0.086-141.184 63.226-141.369 141.199v225.716a139.773 139.773 0 0 0 19.578 71.494 192.304 192.304 0 0 1 54.801-42.724c-7.426-7.915-7.196-20.282 0.513-27.918l128.521-128.51z" fill="#FFFFFF"></path><path d="M545.282 772.015c-29.901-94.918-127.485-151.141-224.61-129.445l-17.703 17.701c-7.876 7.865-20.637 7.865-28.513 0l-0.511-0.594a192.208 192.208 0 0 0-54.716 42.549c25.373 43.2 71.701 69.744 121.791 69.79l204.262-0.001z" fill="#FFFFFF" opacity=".4"></path><path d="M737.813 374.04a19.926 19.926 0 0 1 10.644-3.749 191.405 191.405 0 0 0 56.333-33.533c-24.857-44.842-72.05-72.723-123.322-72.857H502.734c29.621 71.869 99.716 118.747 177.455 118.648a191.46 191.46 0 0 0 57.624-8.509z" fill="#FFFFFF"></path></symbol><symbol id="icon-QQ" viewBox="0 0 1024 1024"><path d="M511.500488 512.499512m-511.500488 0a511.500488 511.500488 0 1 0 1023.000976 0 511.500488 511.500488 0 1 0-1023.000976 0Z" fill="#1BC1FA"></path><path d="M784.234146 572.440976c8.178014 0 16.273108 0.253752 24.282287 0.728288-16.961436-38.434466-42.247742-69.886751-58.977405-90.331785 2.822244-8.482716 11.30496-56.536788-25.443153-90.453666v-2.827239c0-132.850263-96.103149-231.785647-214.822213-231.785647-118.717065 0-214.82521 96.107145-214.825209 231.785647v2.827239c-33.915879 33.915879-25.437159 81.969951-19.782681 90.453666-25.444152 28.265397-73.49223 87.62343-76.320469 155.461182 0 16.961436 2.827239 45.226833 11.305959 56.531794 11.305959 14.133198 39.570357-2.827239 62.186272-48.054073 5.650482 19.788675 19.78368 53.709549 50.876316 93.281905-50.876316 11.302962-65.009514 62.186271-48.049077 90.450669 11.305959 19.788675 39.570357 33.920874 87.624429 33.920874 78.496343 0 115.815899-19.378076 134.378771-35.711126C492.644901 814.680414 490.520976 800.136617 490.520976 785.233171c0-117.522232 131.500581-212.792195 293.71317-212.792195z" fill="#FFFFFF"></path><path d="M514.925143 819.204995c5.654478 0 11.309955 2.82624 14.132199 5.649483 16.960437 16.960437 53.709549 39.575352 138.50674 39.575352 48.054072 0 76.320468-16.960437 87.625428-33.920874 16.960437-28.264398 2.827239-79.147707-48.054072-90.450669 31.092636-39.572355 45.225834-73.493229 50.881311-93.281905 19.787676 45.226833 50.881311 62.18727 62.186271 48.054073 2.827239-11.30496 5.650482-39.570357 5.650482-56.531794-1.93511-23.223321-8.508691-45.121936-17.337069-65.128398-8.009179-0.475536-16.104273-0.729288-24.282287-0.729287-162.212589 0-293.713171 95.269963-293.71317 212.792195 0 14.903446 2.123926 29.447243 6.147996 43.485533a88.18688 88.18688 0 0 0 4.122973-3.864226c2.827239-2.823243 8.481717-5.649483 14.133198-5.649483z" fill="#FFFFFF" opacity=".4"></path></symbol><symbol id="icon-weixin" viewBox="0 0 1024 1024"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#15C434"></path><path d="M825.804 582.368c0-89.149-85.233-161.42-190.375-161.42-105.141 0-190.375 72.271-190.375 161.42 0 89.15 85.234 161.42 190.375 161.42 22.077 0 43.27-3.196 62.986-9.057 5.626-1.672 62.218 38.114 65.089 35.691s-25.78-51.72-18.917-55.8c49.106-29.191 81.217-77.541 81.217-132.254zM575.95 559.207c-14.723 0-26.658-11.938-26.658-26.662 0-14.723 11.936-26.658 26.658-26.658 14.724 0 26.658 11.936 26.658 26.658 0 14.724-11.934 26.662-26.658 26.662z m124.025 0c-14.723 0-26.658-11.938-26.658-26.662 0-14.723 11.936-26.658 26.658-26.658 14.724 0 26.659 11.936 26.659 26.658 0 14.724-11.936 26.662-26.659 26.662z m0 0" fill="#FFFFFF"></path><path d="M422.978 252.292c-124.531 0-225.481 85.883-225.481 191.821 0 27.123 6.621 52.928 18.559 76.314C232.757 516.279 250.956 514 270 514c81.186 0 147 41.414 147 92.5 0 10.162-2.612 19.938-7.423 29.085 4.435 0.222 8.9 0.348 13.401 0.348 5.83 0 11.61-0.187 17.327-0.556-6.309-16.715-9.73-34.521-9.73-53.009 0.004-95.927 91.717-173.693 204.854-173.693 3.09 0 6.159 0.067 9.215 0.184-19.46-89.099-111.297-156.567-221.666-156.567z m-77.09 161.42c-18.392 0-33.299-14.908-33.299-33.299 0-18.388 14.908-33.296 33.299-33.296 18.387 0 33.295 14.908 33.295 33.296 0 18.391-14.908 33.299-33.295 33.299z m154.904 0c-18.388 0-33.296-14.908-33.296-33.299 0-18.388 14.908-33.296 33.296-33.296 18.391 0 33.298 14.908 33.298 33.296 0 18.391-14.907 33.299-33.298 33.299z" fill="#FFFFFF"></path><path d="M270 514c-19.044 0-37.243 2.279-53.944 6.427 15.305 29.982 39.35 55.989 69.399 75.694 8.851 5.804-29.853 61.271-22.529 66.45s67.883-43.248 74.597-40.906c22.437 7.824 46.68 12.652 72.053 13.92 4.811-9.146 7.423-18.923 7.423-29.085C417 555.414 351.186 514 270 514z" fill="#FFFFFF" opacity=".4"></path></symbol><symbol id="icon-wifi" viewBox="0 0 1024 1024"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#56F06E"></path><path d="M512.795 717.336c21.85 0 39.558-17.709 39.558-39.558s-17.708-39.561-39.558-39.561c-21.848 0-39.559 17.712-39.559 39.561s17.711 39.558 39.559 39.558z m91.938-107.795a31.43 31.43 0 0 1-19.778-7.93c-41.037-36.922-103.323-36.922-144.36 0-12.044 10.809-30.54 9.927-41.501-1.98-10.806-12.046-9.923-30.539 1.983-41.501 63.188-57.612 159.729-58.048 223.439-1.011 11.931 10.965 12.816 29.493 1.979 41.541a29.116 29.116 0 0 1-21.762 10.881z" fill="#FFFFFF"></path><path d="M687.817 526.501a33.988 33.988 0 0 1-20.794-7.929 225.374 225.374 0 0 0-154.229-61.32 223.557 223.557 0 0 0-154.23 61.32c-11.892 10.881-30.66 10.881-41.541-0.97-11.851-12.864-11.851-31.673 0-42.554a282.622 282.622 0 0 1 195.771-77.054 287.178 287.178 0 0 1 195.771 77.095c11.728 10.646 12.603 28.786 1.952 40.507-0.314 0.355-0.644 0.697-0.982 1.03a31.73 31.73 0 0 1-21.718 9.912v-0.037z" fill="#FFFFFF"></path><path d="M800.504 383.11C722.4 308.967 620.548 267.427 512.795 267.427c-33.628 0-66.686 4.047-98.627 11.897 3.013 20.934-0.839 43.224-10.567 64.602a356.299 356.299 0 0 1 109.194-17.202 352.917 352.917 0 0 1 246.17 99.908 33.97 33.97 0 0 0 20.791 7.888 28.036 28.036 0 0 0 21.722-9.871c10.88-11.849 10.88-30.618-0.974-41.539z" fill="#FFFFFF"></path><path d="M414.168 279.324c-70.407 17.305-135.393 53.097-189.123 104.796-11.852 10.881-11.852 29.649-0.972 41.501l0.297 0.297c11.74 11.575 30.64 11.442 42.215-0.297a356.309 356.309 0 0 1 137.016-81.695c9.728-21.378 13.58-43.668 10.567-64.602z" fill="#FFFFFF" opacity=".4"></path></symbol><symbol id="icon-github" viewBox="0 0 1024 1024"><path d="M512 512m-512 0a512 512 0 1 0 1024 0 512 512 0 1 0-1024 0Z" fill="#4186F5"></path><path d="M611.944 302.056c0-15.701 2.75-30.802 7.816-44.917a384.238 384.238 0 0 0-186.11 2.956c-74.501-50.063-93.407-71.902-107.975-39.618a136.243 136.243 0 0 0-3.961 102.287 149.515 149.515 0 0 0-39.949 104.806c0 148.743 92.139 181.875 179.961 191.61a83.898 83.898 0 0 0-25.192 51.863c-40.708 22.518-91.94 8.261-115.181-32.058a83.117 83.117 0 0 0-60.466-39.98s-38.871-0.361-2.879 23.408a102.97 102.97 0 0 1 43.912 56.906s23.398 75.279 133.531 51.863v65.913c0 10.443 13.548 42.63 102.328 42.63 71.275 0 94.913-30.385 94.913-42.987V690.485a90.052 90.052 0 0 0-26.996-72.03c83.996-9.381 173.328-40.204 179.6-176.098a164.706 164.706 0 0 1-21.129 1.365c-84.07 0-152.223-63.426-152.223-141.666z" fill="#FFFFFF"></path><path d="M743.554 322.765a136.267 136.267 0 0 0-3.961-102.289s-32.396-10.445-107.979 39.618a385.536 385.536 0 0 0-11.853-2.956 132.623 132.623 0 0 0-7.816 44.917c0 78.24 68.152 141.667 152.222 141.667 7.171 0 14.222-0.472 21.129-1.365 0.231-5.03 0.363-10.187 0.363-15.509a149.534 149.534 0 0 0-42.105-104.083z" fill="#FFFFFF" opacity=".4"></path></symbol></svg>
+<div class="pace pace-inactive">
+    <div class="pace-progress" data-progress-text="100%" data-progress="99" style="transform: translate3d(100%, 0px, 0px);">
+        <div class="pace-progress-inner"></div>
+    </div>
+    <div class="pace-activity"></div>
+</div>
+<div id="loading-box" onclick="document.getElementById(&quot;loading-box&quot;).classList.add(&quot;loaded&quot;)" class="loaded">
+    <div class="loading-bg"><img class="loading-img no-lazyload" th:src="'https://q1.qlogo.cn/g?b=qq&amp;nk='+${theme.config.personal.qq}+'&amp;s=5'" th:data-lazy-src="'https://q1.qlogo.cn/g?b=qq&amp;nk='+${theme.config.personal.qq}+'&amp;s=5'"></div>
+</div>
+<div id="web_bg"></div>
+
+<!--内容输出-->
+<th:block th:replace="${content}"></th:block>
+<!--右侧组件-->
+<th:block th:replace="~{modules/widgets/rightSide :: rightSide}" />
+<div>
+    <script th:src="@{/assets/js/utils.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+    <script src="https://cdn.staticfile.org/fancyapps-ui/4.0.27/fancybox.umd.min.js"></script>
+    <script src="https://cdn.staticfile.org/node-snackbar/0.1.16/snackbar.min.js"></script>
+    <script src="https://cdn.staticfile.org/algoliasearch/4.13.1/algoliasearch-lite.umd.min.js"></script>
+    <script src="https://cdn.staticfile.org/instantsearch.js/4.49.0/instantsearch.production.min.js"></script>
+<!--    <script th:src="@{/assets/js/algolia.min.js}"></script>-->
+    <script>
+        var preloader = {
+            endLoading: () => {
+                document.body.style.overflow = 'auto';
+                document.getElementById('loading-box').classList.add("loaded")
+            },
+            initLoading: () => {
+                document.body.style.overflow = '';
+                document.getElementById('loading-box').classList.remove("loaded")
+
+            }
+        }
+        window.addEventListener('load', preloader.endLoading())
+    </script>
+
+
+
+    <div class="js-pjax">
+<!--        <script>-->
+<!--            (() => {-->
+<!--                const getCommentUrl = () => {-->
+<!--                    const eleGroup = document.querySelectorAll('#recent-posts .article-title')-->
+<!--                    let urlArray = []-->
+<!--                    eleGroup.forEach(i => {-->
+<!--                        urlArray.push(i.getAttribute('href'))-->
+<!--                    })-->
+<!--                    return urlArray-->
+<!--                }-->
+
+<!--                const getCount = () => {-->
+<!--                    const runTwikoo = () => {-->
+<!--                        twikoo.getCommentsCount({-->
+<!--                            envId: 'https://twikoo.leonus.cn/',-->
+<!--                            region: '',-->
+<!--                            urls: getCommentUrl(),-->
+<!--                            includeReply: false-->
+<!--                        }).then(function(res) {-->
+<!--                            document.querySelectorAll('#recent-posts .twikoo-count').forEach((item, index) => {-->
+<!--                                item.innerText = res[index].count-->
+<!--                            })-->
+<!--                        }).catch(function(err) {-->
+<!--                            console.log(err)-->
+<!--                        })-->
+<!--                    }-->
+
+<!--                    if (typeof twikoo === 'object') {-->
+<!--                        runTwikoo()-->
+<!--                    } else {-->
+<!--                        getScript('https://cdn.staticfile.org/twikoo/1.6.8/twikoo.all.min.js').then(runTwikoo)-->
+<!--                    }-->
+<!--                }-->
+
+<!--                window.pjax ? getCount() : window.addEventListener('load', getCount)-->
+
+<!--            })()-->
+<!--        </script>-->
+    </div>
+    <script>
+        window.addEventListener('load', () => {
+            const changeContent = (content) => {
+                if (content === '') return content
+
+                content = content.replace(/<img.*?src="(.*?)"?[^\>]+>/ig, '[图片]') // replace image link
+                content = content.replace(/<a[^>]+?href=["']?([^"']+)["']?[^>]*>([^<]+)<\/a>/gi, '[链接]') // replace url
+                content = content.replace(/<pre><code>.*?<\/pre>/gi, '[代码]') // replace code
+                content = content.replace(/<[^>]+>/g, "") // remove html tag
+
+                if (content.length > 150) {
+                    content = content.substring(0, 150) + '...'
+                }
+                return content
+            }
+
+            const getComment = () => {
+                const runTwikoo = () => {
+                    twikoo.getRecentComments({
+                        envId: 'https://twikoo.leonus.cn/',
+                        region: '',
+                        pageSize: 5,
+                        includeReply: true
+                    }).then(function(res) {
+                        const twikooArray = res.map(e => {
+                            return {
+                                'content': changeContent(e.comment),
+                                'avatar': e.avatar,
+                                'nick': e.nick,
+                                'url': e.url + '#' + e.id,
+                                'date': new Date(e.created).toISOString()
+                            }
+                        })
+
+                        saveToLocal.set('twikoo-newest-comments', JSON.stringify(twikooArray), 10 / (60 * 24))
+                        generateHtml(twikooArray)
+                    }).catch(function(err) {
+                        const $dom = document.querySelector('#card-newest-comments .aside-list')
+                        $dom.innerHTML = "无法获取评论，请确认相关配置是否正确"
+                    })
+                }
+
+                if (typeof twikoo === 'object') {
+                    runTwikoo()
+                } else {
+                    getScript('https://cdn.staticfile.org/twikoo/1.6.8/twikoo.all.min.js').then(runTwikoo)
+                }
+            }
+
+            const generateHtml = array => {
+                let result = ''
+
+                if (array.length) {
+                    for (let i = 0; i < array.length; i++) {
+                        result += '<div class=\'aside-list-item\'>'
+
+                        if (true) {
+                            const name = 'src'
+                            result += `<a href='${array[i].url}' class='thumbnail'><img ${name}='${array[i].avatar}' alt='${array[i].nick}'></a>`
+                        }
+
+                        result += `<div class='content'>
+        <a class='comment' href='${array[i].url}' title='${array[i].content}'>${array[i].content}</a>
+        <div class='name'><span>${array[i].nick} / </span><time datetime="${array[i].date}">${btf.diffDate(array[i].date, true)}</time></div>
+        </div></div>`
+                    }
+                } else {
+                    result += '没有评论'
+                }
+
+                let $dom = document.querySelector('#card-newest-comments .aside-list')
+                $dom.innerHTML = result
+                window.lazyLoadInstance && window.lazyLoadInstance.update()
+                window.pjax && window.pjax.refresh($dom)
+            }
+
+            const newestCommentInit = () => {
+                if (document.querySelector('#card-newest-comments .aside-list')) {
+                    const data = saveToLocal.get('twikoo-newest-comments')
+                    if (data) {
+                        generateHtml(JSON.parse(data))
+                    } else {
+                        getComment()
+                    }
+                }
+            }
+
+            newestCommentInit()
+            document.addEventListener('pjax:complete', newestCommentInit)
+        })
+    </script>
+    <script defer="" src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/jquery/3.6.0/jquery.min.js"></script>
+    <script defer="" th:src="@{/assets/js/winbox.bundle.min.js}"></script>
+    <script defer="" th:src="@{/assets/js/waterfall.js}"></script>
+    <script defer="" th:src="@{/assets/js/imgStatus.js}"></script>
+    <script defer="" th:src="@{/assets/js/lately.js}"></script>
+    <script defer="" src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/clipboard.js/2.0.10/clipboard.min.js"></script>
+    <script defer="" src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/echarts/5.3.0-rc.1/echarts.common.min.js"></script>
+    <script defer="" data-pace-options="{&quot;restartOnRequestAfter&quot;:false,&quot;eventLag&quot;:false}" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/pace/1.2.4/pace.min.js"></script>
+    <script defer="" th:src="@{/assets/js/leonus.js}"></script>
+    <script src="https://cdn.staticfile.org/pjax/0.2.8/pjax.min.js"></script>
+    <script>
+        let pjaxSelectors = ["head > title", "#config-diff", "#body-wrap", "#rightside-config-hide", "#rightside-config-show", ".js-pjax"]
+
+        var pjax = new Pjax({
+            elements: 'a:not([target="_blank"])',
+            selectors: pjaxSelectors,
+            cacheBust: false,
+            analytics: false,
+            scrollRestoration: false
+        })
+
+        document.addEventListener('pjax:send', function() {
+
+            // removeEventListener scroll
+            window.tocScrollFn && window.removeEventListener('scroll', window.tocScrollFn)
+            window.scrollCollect && window.removeEventListener('scroll', scrollCollect)
+
+            typeof preloader === 'object' && preloader.initLoading()
+            document.getElementById('rightside').style.cssText = "opacity: ''; transform: ''"
+
+            if (window.aplayers) {
+                for (let i = 0; i < window.aplayers.length; i++) {
+                    if (!window.aplayers[i].options.fixed) {
+                        window.aplayers[i].destroy()
+                    }
+                }
+            }
+
+            typeof typed === 'object' && typed.destroy()
+
+            //reset readmode
+            const $bodyClassList = document.body.classList
+            $bodyClassList.contains('read-mode') && $bodyClassList.remove('read-mode')
+
+            typeof disqusjs === 'object' && disqusjs.destroy()
+        })
+
+        document.addEventListener('pjax:complete', function() {
+            window.refreshFn()
+
+            document.querySelectorAll('script[data-pjax]').forEach(item => {
+                const newScript = document.createElement('script')
+                const content = item.text || item.textContent || item.innerHTML || ""
+                Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+                newScript.appendChild(document.createTextNode(content))
+                item.parentNode.replaceChild(newScript, item)
+            })
+
+            GLOBAL_CONFIG.islazyload && window.lazyLoadInstance.update()
+
+            typeof chatBtnFn === 'function' && chatBtnFn()
+            typeof panguInit === 'function' && panguInit()
+
+            // google analytics
+            typeof gtag === 'function' && gtag('config', '', {
+                'page_path': window.location.pathname
+            });
+
+            // baidu analytics
+            typeof _hmt === 'object' && _hmt.push(['_trackPageview', window.location.pathname]);
+
+            typeof loadMeting === 'function' && document.getElementsByClassName('aplayer').length && loadMeting()
+
+            // prismjs
+            typeof Prism === 'object' && Prism.highlightAll()
+
+            typeof preloader === 'object' && preloader.endLoading()
+        })
+
+        document.addEventListener('pjax:error', (e) => {
+            if (e.request.status === 404) {
+                pjax.loadUrl('/404.html')
+            }
+        })
+    </script>
+    <script async="" data-pjax="" th:src="@{/assets/js/bsz.js}"></script>
+</div>
+<!-- hexo injector body_end start -->
+<div class="js-pjax">
+    <script async="async">
+        var arr = document.getElementsByClassName('recent-post-item');
+        for (var i = 0; i < arr.length; i++) {
+            arr[i].classList.add('wow');
+            arr[i].classList.add('animate__fadeIn');
+            arr[i].setAttribute('data-wow-duration', '1s');
+            arr[i].setAttribute('data-wow-delay', '200ms');
+            arr[i].setAttribute('data-wow-offset', '100');
+            arr[i].setAttribute('data-wow-iteration', '1');
+        }
+    </script>
+    <script async="async">
+        var arr = document.getElementsByClassName('card-widget');
+        for (var i = 0; i < arr.length; i++) {
+            arr[i].classList.add('wow');
+            arr[i].classList.add('animate__fadeIn');
+            arr[i].setAttribute('data-wow-duration', '');
+            arr[i].setAttribute('data-wow-delay', '');
+            arr[i].setAttribute('data-wow-offset', '');
+            arr[i].setAttribute('data-wow-iteration', '');
+        }
+    </script>
+
+</div>
+<script defer="" src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/wow/1.1.2/wow.min.js"></script>
+<script defer="" th:src="@{/assets/js/wow_init.min.js}"></script>
+
+<!--标签随机颜色-->
+<script>
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    const colors = [];
+    for (let i = 0; i < 500; i++) {
+        colors.push(getRandomColor());
+    }
+
+    $(document).ready(function() {
+        $(".tag-cloud-list a").each(function() {
+            var randomIndex = Math.floor(Math.random() * colors.length);
+            $(this).css("color", colors[randomIndex]);
+        });
+
+        $(".card-tag-cloud a").each(function() {
+            var randomIndex = Math.floor(Math.random() * colors.length);
+            $(this).css("color", colors[randomIndex]);
+        });
+    });
+</script>
+
+
+</body>
+</html>

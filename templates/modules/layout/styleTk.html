@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="styleTk">
+  <style type="text/css">
+    .tk-avatar {
+      flex-shrink: 0;
+      height: 2.5rem;
+      width: 2.5rem;
+      overflow: hidden;
+      text-align: center;
+      border-radius: 5px;
+      margin-right: 1rem;
+    }
+
+    .tk-comment .tk-submit .tk-avatar,
+    .tk-replies .tk-avatar {
+      height: 1.6rem;
+      width: 1.6rem;
+    }
+
+    .tk-avatar.tk-has-avatar {
+      background-color: rgba(144, 147, 153, 0.13);
+    }
+
+    .tk-avatar.tk-clickable {
+      cursor: pointer;
+    }
+
+    .tk-avatar .tk-avatar-img {
+      height: 2.5rem;
+      color: #c0c4cc;
+    }
+
+    .tk-comment .tk-submit .tk-avatar .tk-avatar-img,
+    .tk-replies .tk-avatar .tk-avatar-img {
+      height: 1.6rem;
+    }
+  </style>
+  <style type="text/css">
+    .tk-meta-input {
+      display: flex;
+    }
+
+    .tk-meta-input .el-input {
+      width: auto;
+      width: calc((100% - 1rem) / 3);
+      /* Fix Safari */
+      flex: 1;
+    }
+
+    .tk-meta-input .el-input+.el-input {
+      margin-left: 0.5rem;
+    }
+
+    .tk-meta-input .el-input .el-input-group__prepend {
+      padding: 0 1rem;
+    }
+
+    .tk-meta-input .el-input input:invalid {
+      border: 1px solid #f56c6c;
+      box-shadow: none;
+    }
+
+    @media screen and (max-width: 767px) {
+      .tk-meta-input {
+        flex-direction: column;
+      }
+      .tk-meta-input .el-input {
+        width: auto;
+      }
+      .tk-meta-input .el-input+.el-input {
+        margin-left: 0;
+        margin-top: 0.5rem;
+      }
+    }
+  </style>
+  <style type="text/css">
+    .tk-submit {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tk-row {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .tk-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tk-meta-input {
+      margin-bottom: 0.5rem;
+    }
+
+    .tk-row.actions {
+      position: relative;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      margin-left: 3.5rem;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .tk-row-actions-start {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .tk-submit-action-icon {
+      align-self: center;
+      display: inline-block;
+      width: 1.25em;
+      line-height: 0;
+      margin-right: 10px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .tk-submit-action-icon svg:hover {
+      opacity: 0.8;
+    }
+
+    .tk-submit-action-icon.__markdown {
+      color: #909399;
+    }
+
+    .tk-error-message {
+      word-break: break-all;
+      color: #ff0000;
+      font-size: 0.75em;
+      flex-shrink: 1;
+    }
+
+    .tk-input-image {
+      display: none;
+    }
+
+    .tk-input {
+      flex: 1;
+    }
+
+    .tk-input .el-textarea__inner {
+      background-position: right bottom;
+      background-repeat: no-repeat;
+    }
+
+    .tk-preview-container {
+      margin-left: 3rem;
+      margin-bottom: 1rem;
+      padding: 5px 15px;
+      border: 1px solid rgba(128, 128, 128, 0.31);
+      border-radius: 4px;
+      word-break: break-word;
+    }
+  </style>
+  <style type="text/css">
+    .tk-action {
+      display: flex;
+      align-items: center;
+    }
+
+    .tk-action-link {
+      margin-left: 0.5rem;
+      color: #409eff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .tk-action-link .tk-action-icon-solid {
+      display: none;
+    }
+
+    .tk-action-link.tk-liked .tk-action-icon,
+    .tk-action-link:hover .tk-action-icon {
+      display: none;
+    }
+
+    .tk-action-link.tk-liked .tk-action-icon-solid,
+    .tk-action-link:hover .tk-action-icon-solid {
+      display: block;
+    }
+
+    .tk-action-count {
+      margin-left: 0.25rem;
+      font-size: 0.75rem;
+      height: 1.5rem;
+      line-height: 1.5rem;
+    }
+
+    .tk-action-icon {
+      display: inline-block;
+      height: 1em;
+      width: 1em;
+      line-height: 0;
+      color: #409eff;
+    }
+  </style>
+  <style type="text/css">
+    .tk-main {
+      flex: 1;
+      width: 0;
+    }
+
+    .tk-row {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    .tk-nick-link {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .tk-replies .tk-nick-link {
+      font-size: .9em;
+    }
+
+    .tk-nick-link:hover {
+      color: #409eff;
+    }
+
+    .tk-actions {
+      display: none;
+      margin-left: 1em;
+    }
+
+    .tk-comment:hover .tk-actions {
+      display: inline;
+    }
+
+    .tk-extras {
+      color: #999999;
+      font-size: 0.875em;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .tk-extra {
+      margin-top: 0.5rem;
+      margin-right: 0.75rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .tk-icon.__comment {
+      height: 1em;
+      width: 1em;
+      line-height: 1;
+    }
+
+    .tk-extra-text {
+      line-height: 1;
+    }
+
+    .tk-tag {
+      display: inline-block;
+      padding: 0 0.5em;
+      font-size: 0.75em;
+      background-color: #f2f6fc;
+    }
+
+    .tk-tag-green {
+      background-color: rgba(103, 194, 58, 0.13);
+      border: 1px solid rgba(103, 194, 58, 0.50);
+      border-radius: 2px;
+      color: #67c23a;
+    }
+
+    .tk-tag-yellow {
+      background-color: rgba(230, 162, 60, 0.13);
+      border: 1px solid rgba(230, 162, 60, 0.50);
+      border-radius: 2px;
+      color: #e6a23c;
+    }
+
+    .tk-tag-blue {
+      background-color: rgba(64, 158, 255, 0.13);
+      border: 1px solid rgba(64, 158, 255, 0.50);
+      border-radius: 2px;
+      color: #409eff;
+    }
+
+    .tk-tag-red {
+      background-color: rgba(245, 108, 108, 0.13);
+      border: 1px solid rgba(245, 108, 108, 0.50);
+      border-radius: 2px;
+      color: #f56c6c;
+    }
+
+    .tk-comment {
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: row;
+      word-break: break-all;
+    }
+
+    .tk-content {
+      margin-top: 0.5rem;
+      overflow: auto;
+      max-height: 500px;
+    }
+
+    .tk-replies .tk-content {
+      font-size: .9em;
+    }
+
+    .tk-comment .vemoji {
+      max-height: 2em;
+      vertical-align: middle;
+    }
+
+    .tk-replies {
+      max-height: 200px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .tk-replies-expand {
+      max-height: none;
+    }
+
+    .tk-submit {
+      margin-top: 1rem;
+    }
+
+    .tk-expand {
+      font-size: 0.75em;
+    }
+  </style>
+  <style type="text/css">
+    .tk-comments-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+
+    .tk-comments-count.__hidden {
+      visibility: hidden;
+    }
+
+    .tk-comments-container {
+      min-height: 10rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tk-comments-no {
+      flex: 1;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tk-comments-error {
+      font-size: 0.75em;
+      color: #ff0000;
+    }
+
+    .tk-icon.__comments {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: sub;
+      margin-left: 0.5em;
+      height: 0.75em;
+      width: 0.75em;
+      line-height: 0;
+      cursor: pointer;
+      color: #409eff;
+    }
+  </style>
+  <style type="text/css">
+    .tk-footer {
+      width: 100%;
+      text-align: end;
+      font-size: 0.75em;
+      color: #999999;
+      margin-top: 1em;
+    }
+  </style>
+  <style type="text/css">
+    .tk-pagination,
+    .tk-pagination-pagers {
+      display: flex;
+    }
+
+    .tk-pagination {
+      width: 100%;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .tk-pagination-options {
+      display: flex;
+      align-items: center;
+    }
+
+    .tk-pagination-pager {
+      width: 2em;
+      height: 2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .tk-pagination-pager.__current {
+      background-color: #409eff;
+      pointer-events: none;
+    }
+
+    .tk-pagination .el-input {
+      width: 50px;
+    }
+
+    .tk-pagination .el-input .el-input__inner {
+      padding: 0;
+      height: 28px;
+      text-align: center;
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    .tk-pagination .el-input .el-input__inner::-webkit-inner-spin-button,
+    .tk-pagination .el-input .el-input__inner::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      appearance: none;
+      margin: 0;
+    }
+  </style>
+  <style type="text/css">
+    .tk-admin-comment {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .tk-admin-comment a {
+      color: currentColor;
+      text-decoration: underline;
+    }
+
+    .tk-admin-warn {
+      margin-bottom: 1em;
+    }
+
+    .tk-admin-comment-filter {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .tk-admin-comment-filter-keyword {
+      flex: 1;
+    }
+
+    .tk-admin-comment-filter-type {
+      height: 32px;
+      margin: 0 0.5em;
+      padding: 0 0.5em;
+      color: #ffffff;
+      background: none;
+      border: 1px solid rgba(144, 147, 153, 0.31);
+      border-radius: 4px;
+      position: relative;
+      -moz-appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .tk-admin-comment-filter-type:focus {
+      border-color: #409eff;
+    }
+
+    .tk-admin-comment-filter-type option {
+      color: initial;
+    }
+
+    .tk-admin-comment-list {
+      margin-top: 1em;
+    }
+
+    .tk-admin-comment-list,
+    .tk-admin-comment-item {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: stretch;
+    }
+
+    .tk-admin-comment-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 0.5em;
+    }
+
+    .tk-admin-comment .tk-avatar {
+      margin-right: 0.5em;
+    }
+
+    .tk-admin-actions {
+      display: flex;
+      margin-bottom: 1em;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    }
+  </style>
+  <style type="text/css">
+    .tk-admin-config-groups {
+      overflow-y: auto;
+      padding-right: 0.5em;
+    }
+
+    .tk-admin-config-groups .tk-admin-config-group,
+    .tk-admin-config-groups .tk-admin-config-group-title {
+      background: transparent;
+    }
+
+    .tk-admin-config-group-title {
+      margin-top: 1em;
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+
+    .tk-admin-config-item {
+      display: grid;
+      align-items: center;
+      grid-template-columns: 30% 70%;
+      margin-top: 1em;
+    }
+
+    .tk-admin-config-title {
+      text-align: right;
+      margin-right: 1em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tk-admin-config-desc {
+      margin-top: 0.5em;
+      font-size: 0.75em;
+      overflow-wrap: break-word;
+    }
+
+    .tk-admin-config-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1em;
+    }
+
+    .tk-admin-config-message {
+      margin-top: 0.5em;
+      text-align: center;
+    }
+
+    .tk-admin-config-email-test-desc {
+      margin: 1em 0;
+    }
+  </style>
+  <style type="text/css">
+    .tk-admin-import {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tk-admin-import-label {
+      margin-top: 1em;
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+
+    .tk-admin-import select,
+    .tk-admin-import input,
+    .tk-admin-import .el-button,
+    .tk-admin-import .el-textarea {
+      margin-top: 1em;
+    }
+  </style>
+  <style type="text/css">
+    .tk-admin-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .tk-admin {
+      position: absolute;
+      top: 0;
+      left: 100%;
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      pointer-events: all;
+      color: #ffffff;
+      background-color: rgba(0, 0, 0, 0.60);
+      backdrop-filter: blur(5px);
+      transition: all 0.5s ease;
+      visibility: hidden;
+    }
+
+    .tk-admin::-webkit-scrollbar {
+      width: 5px;
+      background-color: transparent;
+    }
+
+    .tk-admin::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+
+    .tk-admin::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.31);
+    }
+
+    .tk-admin.__show {
+      left: 0;
+      visibility: visible;
+    }
+
+    .tk-admin-close {
+      position: sticky;
+      float: right;
+      display: block;
+      top: 0;
+      right: 0;
+      width: 1rem;
+      height: 1rem;
+      padding: 1rem;
+      box-sizing: content-box;
+      color: #ffffff;
+    }
+
+    .tk-login,
+    .tk-regist {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .tk-login-title {
+      color: #ffffff;
+      font-size: 1.25rem;
+      text-align: center;
+      margin-top: 10rem;
+    }
+
+    .tk-password,
+    .tk-login-msg {
+      color: #ffffff;
+      width: 80%;
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .tk-password .el-input__inner {
+      min-width: 100px;
+    }
+
+    .tk-login-msg a {
+      color: #ffffff;
+      margin-left: 1em;
+      text-decoration: underline;
+    }
+
+    .tk-regist-button {
+      margin-top: 1rem;
+    }
+
+    .tk-panel {
+      color: #ffffff;
+      padding: 2rem;
+    }
+
+    .tk-panel-title {
+      font-size: 1.5rem;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .tk-panel-logout {
+      color: #ffffff;
+      font-size: 1rem;
+      text-decoration: underline;
+    }
+
+    .tk-panel .tk-tabs {
+      display: flex;
+      margin-bottom: 1em;
+      border-bottom: 2px solid #c0c4cc;
+    }
+
+    .tk-panel .tk-tab {
+      color: #c0c4cc;
+      cursor: pointer;
+      line-height: 2em;
+      margin-right: 2em;
+      margin-bottom: -2px;
+    }
+
+    .tk-panel .tk-tab.__active {
+      color: #ffffff;
+      border-bottom: 2px solid #ffffff;
+    }
+  </style>
+  <style type="text/css">
+    .twikoo {
+      position: relative;
+    }
+
+    .twikoo svg {
+      width: 100%;
+      height: 100%;
+      fill: currentColor;
+    }
+    /* 全局 CSS */
+
+    .tk-expand {
+      width: 100%;
+      cursor: pointer;
+      padding: 0.75em;
+      text-align: center;
+      transition: all 0.5s;
+    }
+
+    .tk-expand:hover {
+      background-color: rgba(0, 0, 0, 0.13);
+    }
+
+    .tk-expand:active {
+      background-color: rgba(0, 0, 0, 0.19);
+    }
+
+    .tk-content img {
+      max-width: 300px;
+      max-height: 300px;
+      vertical-align: middle;
+    }
+
+    .tk-owo-emotion,
+    .twikoo .OwO-item img {
+      width: 3em;
+      height: auto;
+    }
+    /* element-ui overwrite */
+
+    .twikoo .el-input__inner,
+    .twikoo .el-textarea__inner {
+      color: currentColor;
+      background-color: transparent;
+      border-color: rgba(144, 147, 153, 0.31);
+    }
+
+    .twikoo .el-input__inner:hover,
+    .twikoo .el-textarea__inner:hover {
+      border-color: rgba(144, 147, 153, 0.50);
+    }
+
+    .twikoo .el-input__inner:focus,
+    .twikoo .el-textarea__inner:focus {
+      border-color: #409eff;
+    }
+
+    .twikoo .el-input-group__append,
+    .twikoo .el-input-group__prepend {
+      color: currentColor;
+      background-clip: padding-box;
+      background-color: rgba(144, 147, 153, 0.13);
+      border-color: rgba(144, 147, 153, 0.31);
+    }
+
+    .twikoo .el-button:not(.el-button--primary):not(.el-button--text) {
+      color: currentColor;
+      background-color: rgba(144, 147, 153, 0.063);
+      border-color: rgba(144, 147, 153, 0.31);
+    }
+
+    .twikoo .el-button:not(.el-button--primary):not(.el-button--text):active,
+    .twikoo .el-button:not(.el-button--primary):not(.el-button--text):focus,
+    .twikoo .el-button:not(.el-button--primary):not(.el-button--text):hover {
+      color: #409eff;
+      background-color: rgba(64, 158, 255, 0.063);
+      border-color: rgba(64, 158, 255, 0.50);
+    }
+
+    .twikoo .el-button--primary.is-disabled,
+    .twikoo .el-button--primary.is-disabled:active,
+    .twikoo .el-button--primary.is-disabled:focus,
+    .twikoo .el-button--primary.is-disabled:hover {
+      color: rgba(255, 255, 255, 0.63);
+      background-color: rgba(64, 158, 255, 0.50);
+      border-color: transparent;
+    }
+
+    .twikoo .el-loading-mask {
+      background-color: transparent;
+      backdrop-filter: opacity(20%);
+    }
+
+    .twikoo .el-textarea .el-input__count {
+      color: currentColor;
+      background: transparent;
+    }
+
+    .tk-admin-warn {
+      padding: 1rem 1.5rem;
+      background-color: #fff7d0;
+      border-left: 0.5rem solid #e7c000;
+      color: #6b5900;
+      align-self: stretch;
+    }
+  </style>
+</th:block>
+</html>
