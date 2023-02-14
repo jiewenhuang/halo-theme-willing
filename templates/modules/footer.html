@@ -32,12 +32,15 @@
         </div>
         <div id="footer-bottom">
             <div class="footer-bottom-content">
-                <div class="footer-bottom-left"><span>©2022 - 2023 By <a target="_blank" rel="noopener" th:href="${site.url}" title="点击访问主页" style="margin-left:5px">[[${site.title}]] </a></span>
+                <div class="footer-bottom-left">
+                    <span>©2022 - 2023 By <a target="_blank" rel="noopener" th:href="${site.url}" title="点击访问主页" style="margin-left:5px">[[${site.title}]] </a></span>
+                   <th:block th:if="${theme.config.footer.lowerLink}">
                     <div>
-                        <a class="footer-bottom-link" target="_blank" href="https://www.foreverblog.cn/go.html" rel="noopener external nofollow" title="随机访问十年之约友链博客">虫洞</a>
-                        <a class="footer-bottom-link" target="_blank" href="https://www.foreverblog.cn/" rel="noopener external nofollow" title="十年之约">十年之约</a>
-                        <a class="footer-bottom-link" target="_blank" href="https://storeweb.cn/member/o/1462" rel="noopener external nofollow" title="个站商店">个站商店</a>
+                        <th:block th:each="lowerLink : ${theme.config.footer.lowerLink}">
+                        <a class="footer-bottom-link" target="_blank" th:href="${lowerLink.url}" rel="noopener external nofollow" th:title="${lowerLink.url}">[[${lowerLink.name}]]</a>
+                        </th:block>
                     </div>
+                   </th:block>
                 </div>
                 <div class="footer-bottom-right">
                     <div id="runtime" title="已运行时长"></div>
