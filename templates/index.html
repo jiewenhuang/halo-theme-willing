@@ -21,7 +21,7 @@
                 <div class="blog-slider__item swiper-slide swiper-slide-next"
                      th:each="recommendPost : ${theme.config.postSetting.recommend}"
                      th:with="post = ${postFinder.getByName(recommendPost.posts)}"
-                     th:style="'background-image: url('+${post.spec.cover}+'); width: 901px;'" data-swiper-slide-index="5" role="group" aria-label="6 / 7">
+                     th:style="'background-image: url('+${#strings.isEmpty(post.spec.cover) ? theme.config.basics.postRandomImg+'?pageid='+post.metadata.name : post.spec.cover}+'); width: 901px;'" data-swiper-slide-index="5" role="group" aria-label="6 / 7">
                   <div class="blog-slider__content"><a class="blog-slider__title"  th:href="@{${post.status.permalink}}" rel="noopener external nofollow" data-pjax-state="">[[${post.spec.title}]]</a><span class="blog-slider__code">发布时间：[[${#dates.format(post.spec.publishTime,'yyyy-MM-dd')}]]</span>
                     <div class="blog-slider__text">[[${post.status.excerpt}]]</div>
                   </div>
@@ -47,13 +47,13 @@
             </ul>
           </div>
           <div class="recent-post-item wow animate__fadeIn" id="recent-post-item"
-               th:each="post,index : ${posts.items}" data-wow-duration="1s" data-wow-delay="200ms" data-wow-offset="100" data-wow-iteration="1" style="visibility: visible; animation-duration: 1s; animation-delay: 200ms; animation-iteration-count: 1;">
-            <div class="post_cover" th:id="'post_cover_'+${post.metadata.name}" >
+               th:each="post,postStat : ${posts.items}" data-wow-duration="1s" data-wow-delay="200ms" data-wow-offset="100" data-wow-iteration="1" style="visibility: visible; animation-duration: 1s; animation-delay: 200ms; animation-iteration-count: 1;">
+            <div th:class="'post_cover '+${postStat.odd ? 'left' : 'right'}" th:id="'post_cover_'+${post.metadata.name}" >
               <a th:href="${post.status.permalink}" th:title="${post.spec.title}" data-pjax-state=""><img class="post_bg" th:src="${#strings.isEmpty(post.spec.cover) ? theme.config.basics.postRandomImg+'?pageid='+post.metadata.name : post.spec.cover}" onerror="this.onerror=null;this.src='/themes/assets/theme-willing/images/404.gif'" th:alt="${post.spec.title}"></a>
             </div>
             <div class="recent-post-info" id="recent-post-info-[[${post.metadata.name}]]">
               <th:block th:if="${post.spec.pinned}">
-              <span class="newPost-right">置顶</span>
+              <span th:class="${postStat.odd ? 'newPost-right' : 'newPost-left'}">置顶</span>
               </th:block>
               <a class="article-title" th:href="${post.status.permalink}" th:title="${post.spec.title}" data-pjax-state="">[[${post.spec.title}]]</a>
               <div class="article-meta-wrap">
