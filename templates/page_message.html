@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{modules/layout :: html(title = '留言板',htmlType = links,header = null,leftSidebar = true,rightSidebar = false, content = ~{::content}, head = null, footer = null)}"
+>
+<th:block th:fragment="content">
+    <!--  sidebar-->
+    <th:block th:replace="~{modules/widgets/m-sidebar :: sidebar}" />
+    <div class="page" id="body-wrap">
+        <!--    header-->
+        <th:block th:replace="~{modules/header :: header}" />
+    <main class="layout hide-aside" id="content-inner">
+        <div id="page">
+            <h1 class="page-title">留言板</h1>
+            <div id="article-container">
+                <style>
+        #article-container a:not(.headerlink,.fancybox) {
+            font-weight: 700;
+            color: var(--font-color);
+            padding: 0 3px;
+            border-bottom: 2px var(--leonus-purple) solid;
+        }
+        #article-container a:not(.headerlink,.fancybox):hover {
+            color: #fff;
+            border-radius: 5px;
+            text-decoration: none;
+            background-color: var(--leonus-purple);
+        }
+    </style>
+                <article class="post-content" th:utext="${singlePage.content.content}">
+
+                </article>
+            </div>
+            <hr />
+                <div id="post-comment">
+                    <div class="comment-head">
+                        <div class="comment-headline"><i class="fa-solid fa-message fa-fw"></i>
+                            <span> 评论</span>
+                        </div>
+                    </div>
+                    <div class="comment-wrap">
+                        <halo:comment group="content.halo.run" kind="singlePage" th:attr="name=${singlePage.metadata.name}" colorScheme="document.documentElement.getAttribute('data-theme')" />
+                    </div>
+                </div>
+            </div>
+    </main>
+    <th:block th:replace="~{modules/footer :: footer}" />
+
+</th:block>
+</html>
