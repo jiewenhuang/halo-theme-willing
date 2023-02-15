@@ -9,6 +9,10 @@ spec:
         description: 友情链接页
         screenshot:
         file: page_links.html
+      - name: 留言板
+        description: 留言板模板
+        screenshot:
+        file: page_message.html
   displayName: Theme Willing
   author:
     name: Jiewen
