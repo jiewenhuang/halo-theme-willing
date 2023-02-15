@@ -36,8 +36,8 @@
             <div class="meta-firstline">
               <span class="post-meta-btn">
                 <i class="far fa-calendar-alt fa-fw post-meta-icon"></i>
-                <span class="post-meta-label">发表</span
-                ><time class="post-meta-date-created" th:datetime="${post.spec.publishTime}" th:title="${#dates.format(post.spec.publishTime,'yyyy-MM-dd')}">[[${#dates.format(post.spec.publishTime,'yyyy-MM-dd')}]]</time>
+                <span class="post-meta-label">发表</span>
+                <time class="post-meta-date-created" th:datetime="${post.spec.publishTime}" th:title="${#dates.format(post.spec.publishTime,'yyyy-MM-dd')}">[[${#dates.format(post.spec.publishTime,'yyyy-MM-dd')}]]</time>
               </span>
               <span class="post-meta-btn">
                 <i class="fas fa-history fa-fw post-meta-icon"></i>
@@ -45,9 +45,9 @@
                 <time class="post-meta-date-updated" th:datetime="${post.status.lastModifyTime}" th:title="${#dates.format(post.status.lastModifyTime,'yyyy-MM-dd')}">[[${#dates.format(post.status.lastModifyTime,'yyyy-MM-dd')}]]</time>
               </span>
             </div>
-            <div class="meta-secondline">
-              <span class="post-meta-btn"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count"></span></span><span class="post-meta-btn"><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span>
-              <span th:with="wordCount = ${#strings.length(post.content.content)}">
+            <div class="meta-secondline" th:with="wordCount = ${#strings.length(post.content.content)}">
+              <span class="post-meta-btn"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">[[${wordCount}]]</span></span><span class="post-meta-btn"><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span>
+              <span >
                 <th:block th:if="${wordCount / 400 lt 1}">
               1 分钟
               </th:block>
@@ -56,8 +56,8 @@
               </th:block>
               </span>
             </span>
-              <span class="post-meta-pv-cv post-meta-btn" id="" data-flag-title="随机访问一篇文章的实现"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv">114</span></span><span class="post-meta-commentcount post-meta-link-btn"><i class="fas fa-message post-meta-icon"></i><a href="#post-comment" data-pjax-state=""><span class="post-meta-label">评论数:</span>
-                    <span id="twikoo-count">[[${post.stats.comment}]]</span>
+              <span class="post-meta-pv-cv post-meta-btn" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span>[[${post.stats.visit}]]</span></span><span class="post-meta-commentcount post-meta-link-btn"><i class="fas fa-message post-meta-icon"></i><a href="#post-comment" data-pjax-state=""><span class="post-meta-label">评论数:</span>
+                    <span>[[${post.stats.comment}]]</span>
                     </a>
                     </span>
             </div>
@@ -102,7 +102,7 @@
           <th:block th:if="${postCursor.hasPrevious() == true && postCursor.hasNext() == true}">
           <div class="prev-post pull-left">
             <a th:href="@{${postCursor.previous.status.permalink}}" data-pjax-state="">
-              <img class="prev-cover" th:src="${postCursor.previous.spec.cover}" onerror="onerror=null;src='/themes/assets/theme-willing/images/404.gif'" alt="cover of previous post">
+              <img class="prev-cover" th:src="${#strings.isEmpty(postCursor.previous.spec.cover) ? theme.config.basics.postRandomImg+'?pageid='+postCursor.previous.metadata.name : postCursor.previous.spec.cover}" onerror="onerror=null;src='/themes/assets/theme-willing/images/404.gif'" alt="cover of previous post">
               <div class="pagination-info">
                 <div class="label">上一篇</div>
                 <div class="prev_info" th:text="${postCursor.previous.spec.title}"></div>
@@ -111,7 +111,7 @@
           </div>
           <div class="next-post pull-right">
             <a th:href="@{${postCursor.next.status.permalink}}" data-pjax-state="">
-              <img class="next-cover" th:src="${postCursor.next.spec.cover}" onerror="onerror=null;src='/themes/assets/theme-willing/images/404.gif'" alt="cover of next post">
+              <img class="next-cover" th:src="${#strings.isEmpty(postCursor.next.spec.cover) ? theme.config.basics.postRandomImg+'?pageid='+postCursor.next.metadata.name : postCursor.next.spec.cover}" onerror="onerror=null;src='/themes/assets/theme-willing/images/404.gif'" alt="cover of next post">
               <div class="pagination-info">
                 <div class="label">下一篇</div>
                 <div class="next_info" th:text="${postCursor.next.spec.title}"></div>
@@ -119,22 +119,22 @@
             </a>
           </div>
           </th:block>
-          <th:block th:if="${postCursor.hasNext() == null}">
-            <div class="prev-post pull-full">
+          <th:block th:if="${postCursor.hasNext() && postCursor.hasPrevious() != true}">
+            <div class="next-post pull-full">
               <a th:href="@{${postCursor.next.status.permalink}}" data-pjax-state="">
-                <img class="prev-cover" th:src="${postCursor.next.spec.cover}" onerror="onerror=null;src='/themes/assets/theme-willing/images/404.gif'" alt="cover of previous post">
-                <div class="pagination-info"><div class="label">上一篇</div>
+                <img class="prev-cover" th:src="${#strings.isEmpty(postCursor.next.spec.cover) ? theme.config.basics.postRandomImg+'?pageid='+postCursor.next.metadata.name : postCursor.next.spec.cover}" onerror="onerror=null;src='/themes/assets/theme-willing/images/404.gif'" alt="cover of previous post">
+                <div class="pagination-info"><div class="label">下一篇</div>
                   <div class="prev_info" th:text="${postCursor.next.spec.title}"></div>
                 </div>
               </a>
             </div>
           </th:block>
-          <th:block th:if="${postCursor.hasPrevious() == null}">
-            <div class="next-post pull-full">
+          <th:block th:if="${postCursor.hasPrevious() && postCursor.hasNext() != true}">
+            <div class="prev-post pull-full">
               <a th:href="@{${postCursor.previous.status.permalink}}" data-pjax-state="">
-                <img class="next-cover" th:src="${postCursor.previous.spec.title}" onerror="onerror=null;src='/themes/assets/theme-willing/images/404.gif'" alt="cover of next post">
+                <img class="next-cover" th:src="${#strings.isEmpty(postCursor.previous.spec.cover) ? theme.config.basics.postRandomImg+'?pageid='+postCursor.previous.metadata.name : postCursor.previous.spec.cover}" alt="cover of next post">
                 <div class="pagination-info">
-                  <div class="label">下一篇</div>
+                  <div class="label">上一篇</div>
                   <div class="next_info" th:text="${postCursor.previous.spec.title}"></div>
                 </div>
               </a>
@@ -147,10 +147,10 @@
                th:with="recommendPosts = ${postFinder.listByCategory(1,3,recommendPosts.metadata.name)}">
             <th:block th:each="recommendPost : ${recommendPosts.items}">
             <div style="margin: 1px">
-            <a th:href="@{${recommendPost.status.permalink}}" title="51la统计美化" data-pjax-state="">
+            <a th:href="@{${recommendPost.status.permalink}}" th:title="${recommendPost.spec.title}" data-pjax-state="">
               <img class="cover" th:src="${#strings.isEmpty(recommendPost.spec.cover) ? theme.config.basics.postRandomImg+'?pageid='+recommendPost.metadata.name : recommendPost.spec.cover}" alt="cover">
               <div class="content is-center">
-                <div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-07-19</div>
+                <div class="date"><i class="far fa-calendar-alt fa-fw"></i>[[${#dates.format(recommendPost.spec.publishTime,'yyyy-MM-dd')}]]</div>
                 <div class="title">[[${recommendPost.spec.title}]]</div>
               </div>
             </a>
