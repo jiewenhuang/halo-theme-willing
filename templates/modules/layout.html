@@ -323,8 +323,24 @@
     <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.1.1/css/all.min.css" media="all" onload="this.media='all'">
     <link rel="stylesheet" href="https://cdn.staticfile.org/node-snackbar/0.1.16/snackbar.min.css" media="all" onload="this.media='all'">
     <link rel="stylesheet" href="https://cdn.staticfile.org/fancyapps-ui/4.0.27/fancybox.min.css" media="all" onload="this.media='all'">
-
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<!--    随机文章-->
+    <script>
+        function randomPost() {
+            fetch("/sitemap.xml")
+                .then((res) => res.text())
+                .then((str) => new window.DOMParser().parseFromString(str, "text/xml"))
+                .then((data) => {
+                    const locs = data.querySelectorAll("url > loc");
+                    const archivesLocs = [...locs].filter((loc) =>
+                        loc.textContent.includes("archives")
+                    );
+                    const randomLoc =
+                        archivesLocs[Math.floor(Math.random() * archivesLocs.length)];
+                    location.href = randomLoc.textContent;
+                });
+        }
+    </script>
 
 
 
