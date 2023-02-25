@@ -46,7 +46,7 @@
             <th:block th:each="month : ${archive.months}">
               <div class="aside-list" th:with="posts = ${postFinder.list(1,5)}">
                 <div class="aside-list-item" th:each="post : ${month.posts}">
-                  <a class="thumbnail" th:href="@{${post.status.permalink}}" th:title="${post.spec.title}" data-pjax-state=""><img th:src="${#strings.isEmpty(post.spec.cover) ? theme.config.basics.postRandomImg+'?pageid='+post.metadata.name : post.spec.cover}" onerror="this.onerror=null;this.src='/themes/assets/theme-willing/images/404.gif'" th:alt="${post.spec.title}"></a>
+                  <a class="thumbnail" th:href="@{${post.status.permalink}}" th:title="${post.spec.title}" data-pjax-state=""><img th:src="${#strings.isEmpty(post.spec.cover) ? theme.config.basics.postRandomImg+'?pageid='+post.metadata.name : post.spec.cover}" onerror="this.onerror=null;this.src='/themes/theme-willing/assets/images/404.gif'" th:alt="${post.spec.title}"></a>
                   <div class="content"><a class="title" th:href="@{${post.status.permalink}}" th:title="${post.spec.title}" data-pjax-state="">[[${post.spec.title}]]</a><time th:datetime="${#dates.format(post.spec.publishTime,'yyyy-MM-dd')}" th:title="'更新'+ ${#dates.format(post.spec.publishTime,'yyyy-MM-dd')}">[[${#dates.format(post.spec.publishTime,'yyyy-MM-dd')}]]</time>
                   </div>
                 </div>

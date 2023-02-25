@@ -49,7 +49,7 @@
           <div class="recent-post-item wow animate__fadeIn" id="recent-post-item"
                th:each="post,postStat : ${posts.items}" data-wow-duration="1s" data-wow-delay="200ms" data-wow-offset="100" data-wow-iteration="1" style="visibility: visible; animation-duration: 1s; animation-delay: 200ms; animation-iteration-count: 1;">
             <div th:class="'post_cover '+${postStat.odd ? 'left' : 'right'}" th:id="'post_cover_'+${post.metadata.name}" >
-              <a th:href="${post.status.permalink}" th:title="${post.spec.title}" data-pjax-state=""><img class="post_bg" th:src="${#strings.isEmpty(post.spec.cover) ? theme.config.basics.postRandomImg+'?pageid='+post.metadata.name : post.spec.cover}" onerror="this.onerror=null;this.src='/themes/assets/theme-willing/images/404.gif'" th:alt="${post.spec.title}"></a>
+              <a th:href="${post.status.permalink}" th:title="${post.spec.title}" data-pjax-state=""><img class="post_bg" th:src="${#strings.isEmpty(post.spec.cover) ? theme.config.basics.postRandomImg+'?pageid='+post.metadata.name : post.spec.cover}" onerror="this.onerror=null;this.src='/themes/theme-willing/assets/images/404.gif'" th:alt="${post.spec.title}"></a>
             </div>
             <div class="recent-post-info" id="recent-post-info-[[${post.metadata.name}]]">
               <th:block th:if="${post.spec.pinned}">
