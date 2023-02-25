@@ -15,11 +15,11 @@
         <div class="article-sort">
           <div class="article-sort-item" th:each="post : ${posts.items}">
             <a class="article-sort-item-img" th:href="${post.status.permalink}" th:title="${post.spec.title}" data-pjax-state="">
-              <img th:src="${#strings.isEmpty(post.spec.cover) ? theme.config.basics.postRandomImg+'?pageid='+post.metadata.name : post.spec.cover}" th:alt="${post.spec.title}" onerror="this.onerror=null;this.src='/themes/assets/theme-willing/images/404.gif'">
+              <img th:src="${#strings.isEmpty(post.spec.cover) ? theme.config.basics.postRandomImg+'?pageid='+post.metadata.name : post.spec.cover}" th:alt="${post.spec.title}" onerror="this.onerror=null;this.src='/themes/theme-willing/assets/images/404.gif'">
             </a>
             <div class="article-sort-item-info">
               <time class="post-meta-date-created" th:datetime="${post.spec.publishTime}" th:title="'发表 '+${#dates.format(post.spec.publishTime,'yyyy-MM-dd')}">[[${#dates.format(post.spec.publishTime,'yyyy-MM-dd')}]]</time>
-              <a class="article-sort-item-title" th:href="${post.status.permalink}" th:title="${post.spec.title}" data-pjax-state="">旧文整理计划</a>
+              <a class="article-sort-item-title" th:href="${post.status.permalink}" th:title="${post.spec.title}" data-pjax-state="">[[${post.spec.title}]]</a>
               <div class="article-sort-item-tags">
                 <a th:each="tag : ${post.tags}" class="article-meta-tags" th:href="${tag.status.permalink}" data-pjax-state="">#<span>[[${tag.spec.displayName}]]</span></a>
               </div>
