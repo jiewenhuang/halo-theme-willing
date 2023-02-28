@@ -42,7 +42,12 @@
               <li class="categoryBar-list-item current" onclick="pjax.loadUrl(&quot;/&quot;)" id="/"><a class="categoryBar-list-link" href="javascript:;" rel="noopener external nofollow">首页</a></li>
 
               <th:block th:each="menuItem : ${menuItems}">
-              <li class="categoryBar-list-item" th:id="@{${menuItem.status.href}}"><a class="categoryBar-list-link" th:href="@{${menuItem.status.href}}" rel="noopener external nofollow">[[${menuItem.status.displayName}]]</a></li>
+              <li class="categoryBar-list-item"
+                  th:id="@{${menuItem.status.href}}">
+                <a class="categoryBar-list-link"
+                   th:href="@{${menuItem.status.href}}"
+                   th:target="${menuItem.spec.target?.value}"
+                   rel="noopener external nofollow">[[${menuItem.status.displayName}]]</a></li>
               </th:block>
             </ul>
           </div>

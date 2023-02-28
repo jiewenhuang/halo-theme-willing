@@ -36,7 +36,10 @@
             <th:block th:if="${not #lists.isEmpty(menuItem.children)}">
               <ul class="menus_item_child">
                 <li th:each="childMenu : ${menuItem.children}">
-                  <a class="site-page child" th:href="@{${childMenu.status.href}}" data-pjax-state="">
+                  <a class="site-page child"
+                     th:href="@{${childMenu.status.href}}"
+                     th:target="${childMenu.spec.target?.value}"
+                     data-pjax-state="">
                     <th:block th:utext="${#annotations.get(menuItem, 'icon')}"></th:block>
                     <span> [[${childMenu.status.displayName}]]</span>
                   </a>

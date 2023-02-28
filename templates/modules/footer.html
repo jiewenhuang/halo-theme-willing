@@ -23,6 +23,7 @@
                     <th:block th:each="menuItem : ${menuItems}">
                     <a class="footer-item"
                        th:href="@{${menuItem.status.href}}"
+                       th:target="${menuItem.spec.target?.value}"
                        data-pjax-state=""
                        >[[${menuItem.status.displayName}]]</a>
                     </th:block>
