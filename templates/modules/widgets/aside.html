@@ -83,6 +83,7 @@
         </div>
       </div>
     </th:block>
+<!--    归档-->
     <th:block th:fragment="archive">
       <div class="card-widget card-archives wow animate__fadeIn" data-wow-duration="" data-wow-delay="" data-wow-offset="" data-wow-iteration="" style="visibility: hidden; animation-name: none;">
         <div class="item-headline"><i class="fas fa-archive"></i><span>文章归档</span>
@@ -90,15 +91,14 @@
             <i class="fas fa-angle-right"></i></a>
         </div>
         <ul class="card-archive-list" th:with="archives = ${postFinder.archives(1,1000)}">
-          <li class="card-archive-list-item" th:each="archive : ${archives.items}">
-            <th:block th:each="month : ${archive.months}">
-
+          <th:block th:each="archive : ${archives.items}">
+          <li class="card-archive-list-item" th:each="month : ${archive.months}">
               <a class="card-archive-list-link" th:href="@{'/archives/'+${archive.year}+'/'+${month.month}}" data-pjax-state="">
                 <span class="card-archive-list-date">[[${archive.year}]]-[[${month.month}]]</span>
                 <span class="card-archive-list-count" >[[${month.posts.size()}]]</span>
               </a>
-            </th:block>
           </li>
+          </th:block>
 
         </ul>
       </div>
