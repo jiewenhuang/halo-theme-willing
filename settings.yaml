@@ -157,13 +157,13 @@ spec:
         - $formkit: textarea
           name: indexWidgets
           label: 首页左组件
-          value: "personal,notice,updates,comment,tag,archive,information"
-          help: "personal(个人信息),notice(公告),updates(最新文章),comment(最新评论),tag(标签云),archive(归档),information(网站资讯)"
+          value: "personal,notice,updates,weibo,comment,tag,archive,information"
+          help: "personal(个人信息),notice(公告),updates(最新文章),comment(最新评论),tag(标签云),archive(归档),information(网站资讯),微博热搜(weibo)"
         - $formkit: textarea
           name: postWidgets
           label: 文章左组件
           value: "personal,notice,toc,updates"
-          help: "personal(个人信息),toc(目录),updates(最新文章),可自由组合，用英文逗号隔开"
+          help: "personal(个人信息),toc(目录),updates(最新文章),微博热搜(weibo),可自由组合，用英文逗号隔开"
 
 
 

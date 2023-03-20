@@ -341,7 +341,179 @@
                 });
         }
     </script>
+<!--    微博热搜样式-->
+    <style>
+        .hot-ranking-list {
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .hot-ranking-list_item {
+            display: flex;
+            box-sizing: border-box;
+            border-top: 1px solid #ebeef5;
+        }
+        .hot-ranking-list_item > a {
+            width: 100%;
+            height: 40px;
+            line-height: 40px;
+            position: relative;
+            text-decoration: none !important;
+            display: flex;
+            align-items: center;
+            color: var(--main);
+            transition: transform 0.1s ease-in-out;
+        }
+        .hot-ranking_text {
+            width: 100%;
+            display: flex !important;
+            box-sizing: border-box;
+            padding: 0px 30px 0 24px;
+        }
+        .hot-ranking_hot {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            right: 0;
+            top: 0px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #fff;
+            box-sizing: border-box;
+            border-radius: 3px;
+            transform: scale(0.8);
+            background-color: rgb(255, 148, 6);
+        }
+        .hot-ranking_title {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 12px;
+            color: var(--main);
+            margin-right: 10px;
+        }
+        .hot-ranking_number {
+            color: #939393;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .hot-ranking_order-1, .hot-ranking_order-2, .hot-ranking_order-3 {
+            color: #fb113c;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .hot-ranking_order {
+            position: absolute;
+            left: 0;
+            top: 0px;
+            width: 24px;
+            text-align: center;
+            color: #f3ad4e;
+            font-size: 14px;
+        }
+        .hot-ranking_order-1, .hot-ranking_order-2, .hot-ranking_order-3 {
+            color: #fb113c;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .hot-ranking-more {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            border-top: 1px solid #ebeef5;
+            color: #939393;
+            font-size: 12px;
+            padding: 12px;
+            padding-bottom: 0;
+            text-align: center;
+            user-select: none;
+            cursor: pointer;
+            text-decoration: none !important;
+        }
 
+    </style>
+<!--    微博热搜实现-->
+    <script>
+        // 创建XMLHttpRequest对象
+        var xhr = new XMLHttpRequest();
+
+        // 设置请求方法和请求地址
+        xhr.open("GET", "https://www.aapi.icu/call/hot/weibo/?item=8", true);
+
+        // 发送请求
+        xhr.send();
+
+        // 监听状态改变事件
+        xhr.onreadystatechange = function() {
+            if (this.readyState === 4 && this.status === 200) {
+                // 将响应数据转换为JSON格式
+                var response = JSON.parse(this.responseText);
+
+                // 获取热搜数据
+                var hotData = response.data;
+
+                // 创建ul元素
+                var ul = document.createElement("ul");
+                ul.className = "hot-ranking-list";
+
+                // 遍历热搜数据，创建li元素
+                for (var i = 0; i < hotData.length; i++) {
+                    var hot = hotData[i];
+
+                    // 创建li元素
+                    var li = document.createElement("li");
+                    li.className = "hot-ranking-list_item";
+
+                    // 创建a元素
+                    var a = document.createElement("a");
+                    a.href = hot.hot_url;
+                    a.target = "_blank";
+                    a.title = hot.hot_title;
+
+                    // 创建span元素
+                    var spanOrder = document.createElement("span");
+                    spanOrder.className = "hot-ranking_order hot-ranking_order-" + hot.hot_rank;
+                    spanOrder.textContent = hot.hot_rank;
+
+                    var spanText = document.createElement("span");
+                    spanText.className = "hot-ranking_text";
+
+                    var spanTitle = document.createElement("span");
+                    spanTitle.className = "hot-ranking_title";
+                    spanTitle.textContent = hot.hot_title;
+
+                    var spanNumber = document.createElement("span");
+                    spanNumber.className = "hot-ranking_number";
+                    spanNumber.textContent = hot.hot_value;
+
+                    var spanHot = document.createElement("span");
+                    spanHot.className = "hot-ranking_hot";
+                    spanHot.textContent = "热";
+
+                    // 将span元素添加到a元素中
+                    spanText.appendChild(spanTitle);
+                    spanText.appendChild(spanNumber);
+                    a.appendChild(spanOrder);
+                    a.appendChild(spanText);
+                    a.appendChild(spanHot);
+
+                    // 将a元素添加到li元素中
+                    li.appendChild(a);
+
+                    // 将li元素添加到ul元素中
+                    ul.appendChild(li);
+                }
+
+                // 将ul元素添加到页面中
+                document.getElementById("weibo_hot").appendChild(ul);
+            }
+        };
+    </script>
 
 
     <script>
